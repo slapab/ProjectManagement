@@ -7,14 +7,14 @@ class ProjectItem : public virtual ProjectItemInterface
 {
 public:
     ProjectItem();
-    ProjectItem(const QString name, const QDate date);
-    ProjectItem(const QString name, const QString descr, const QDate date);
+    ProjectItem(QString name, QDate date);
+    ProjectItem(QString name, QString descr, QDate date);
 
     virtual ~ProjectItem();
 
-    void setDate(const QDate date) override;
-    void setDescription(const QString descr) override;
-    void setName(const QString name) override;
+    void setDate(QDate date) override;
+    void setDescription(QString descr) override;
+    void setName(QString name) override;
 
     QDate   getDate() const override;
     QString getDescription() const override;
