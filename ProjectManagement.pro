@@ -15,13 +15,16 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     ProjectItem.cpp \
-    ItemsFactory.cpp
+    ItemsFactory.cpp \
+    TimeInterval.cpp
 
 HEADERS  += mainwindow.h \
     ItemsFactoryInterface.h \
     ProjectItem.h \
     ProjectItemInterface.h \
-    ItemsFactory.h
+    ItemsFactory.h \
+    TimeIntervalInterface.h \
+    TimeInterval.h
 
 FORMS    += mainwindow.ui
 

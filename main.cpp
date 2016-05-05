@@ -4,6 +4,7 @@
 #include <QDate>
 #include "ProjectItem.h"
 #include "ItemsFactory.h"
+#include "TimeInterval.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,11 +14,19 @@ int main(int argc, char *argv[])
 //    return a.exec();
 
     ItemsFactory factory;
-    QString name = "MojaNazwa2";
-    auto pProjItem = factory.GetProject(name, "Opis", QDate::currentDate());
+    QString name = "Project 1";
+    auto pProjItem = factory.GetProject(name, "Project 1 descritpion", QDate::currentDate());
 //    pProjItem->setName("ZmieniamNazwe");
 
-    qDebug() << pProjItem->getName() << pProjItem->getDescription() << pProjItem->getDate() ;
+    auto pTInterval = factory.GetTimeInterval("Sprint 1", QDateTime::currentDateTime(), QDateTime::currentDateTime().addDays(1));
 
+
+    qDebug() << "ProjectItem: " << pProjItem->getName() << "\n"
+             << " description: " << pProjItem->getDescription() << "\n"
+             << " creation date: " << pProjItem->getDate() << "\n" ;
+
+    qDebug() << "TimeInterval: " << pTInterval->getName() << "\n"
+             << " begin date: " << pTInterval->GetDatesRange().first << "\n"
+             << " end date: " << pTInterval->GetDatesRange().second ;
     return 0;
 }
