@@ -4,12 +4,12 @@ ProjectItem::ProjectItem()
     : ProjectItemInterface()
 {}
 
-ProjectItem::ProjectItem(const QString name, const QDate date)
+ProjectItem::ProjectItem(QString name, QDate date)
     : m_Name(std::move(name))
     , m_CreationDate(std::move(date))
 {}
 
-ProjectItem::ProjectItem(const QString name, const QString descr, const QDate date)
+ProjectItem::ProjectItem(QString name, QString descr, QDate date)
     : m_Name(std::move(name))
     , m_Description(std::move(descr))
     , m_CreationDate(std::move(date))
@@ -18,7 +18,7 @@ ProjectItem::ProjectItem(const QString name, const QString descr, const QDate da
 ProjectItem::~ProjectItem()
 {}
 
-void ProjectItem::setDate(const QDate date)
+void ProjectItem::setDate(QDate date)
 {
     m_CreationDate = std::move(date);
 }
@@ -28,7 +28,7 @@ QDate ProjectItem::getDate() const
     return m_CreationDate;
 }
 
-void ProjectItem::setDescription(const QString descr)
+void ProjectItem::setDescription(QString descr)
 {
     m_Description = std::move(descr);
 }
@@ -38,7 +38,7 @@ QString ProjectItem::getDescription() const
     return m_Description;
 }
 
-void ProjectItem::setName(const QString name)
+void ProjectItem::setName(QString name)
 {
     m_Name = std::move(name);
 }

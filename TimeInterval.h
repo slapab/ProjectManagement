@@ -7,14 +7,14 @@ class TimeInterval : public virtual TimeIntervalInterface
 {
 public:
     TimeInterval();
-    TimeInterval(const QString name, const QDateTime beginDate, const QDateTime endDate);
+    TimeInterval(QString name, QDateTime beginDate, QDateTime endDate);
     virtual ~TimeInterval();
 
     std::pair<QDateTime, QDateTime> GetDatesRange() const override;
-    void setDatesRange(const QDateTime begin, const QDateTime end) override;
-    void setBeginDate(const QDateTime begin) override;
-    void setEndDate(const QDateTime end) override;
-    void setName(const QString name) override;
+    void setDatesRange(QDateTime begin, QDateTime end) override;
+    void setBeginDate(QDateTime begin) override;
+    void setEndDate(QDateTime end) override;
+    void setName(QString name) override;
     QString getName() const override;
 
 protected:

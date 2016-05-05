@@ -10,9 +10,9 @@ public:
     ProjectItemInterface() = default;
     virtual ~ProjectItemInterface() {}
 
-    virtual void setDate(const QDate date) = 0;
-    virtual void setDescription(const QString descr) = 0;
-    virtual void setName(const QString name) = 0;
+    virtual void setDate(QDate date) = 0;
+    virtual void setDescription(QString descr) = 0;
+    virtual void setName(QString name) = 0;
 
     virtual QDate   getDate() const = 0;
     virtual QString getDescription() const = 0;
