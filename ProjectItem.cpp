@@ -1,31 +1,66 @@
 #include "ProjectItem.h"
 
-ProjectItem::ProjectItem()
+
+ProjectItem::ProjectItem(int id, QString name, QString description, QDate beginDate, QDate endDate)
     : ProjectItemInterface()
-{}
-
-ProjectItem::ProjectItem(QString name, QDate date)
-    : m_Name(std::move(name))
-    , m_CreationDate(std::move(date))
-{}
-
-ProjectItem::ProjectItem(QString name, QString descr, QDate date)
-    : m_Name(std::move(name))
-    , m_Description(std::move(descr))
-    , m_CreationDate(std::move(date))
+    , m_ID(id)
+    , m_Name(std::move(name))
+    , m_Description(std::move(description))
+    , m_CreationDate(std::move(beginDate))
+    , m_EndDate(std::move(endDate))
+    , m_TimeIntervals()
 {}
 
 ProjectItem::~ProjectItem()
 {}
 
-void ProjectItem::setDate(QDate date)
+void ProjectItem::setBeginDate(QDate beginDate)
 {
-    m_CreationDate = std::move(date);
+    m_CreationDate = std::move(beginDate);
 }
 
-QDate ProjectItem::getDate() const
+void ProjectItem::setEndDate(QDate endDate)
 {
-    return m_CreationDate;
+    m_CreationDate = std::move(endDate);
+}
+
+std::pair<QDate, QDate> ProjectItem::getDates() const
+{
+    return std::make_pair(m_CreationDate, m_EndDate);
+}
+
+void ProjectItem::setTimeIntervalsContainer(ProjectItemInterface::TimeIntervalsContainerType &&storage)
+{
+    m_TimeIntervals = std::move(storage);
+}
+
+void ProjectItem::addTimeInterval(std::unique_ptr<TimeInterval> item)
+{
+    m_TimeIntervals.push_back(std::move(item));
+}
+
+void ProjectItem::removeTimeInterval(int id)
+{
+
+    // predictate lambda for searching element with given ID
+    // the item is TimeInterval
+    auto predictate = [&](const auto & item) -> bool
+    {
+        return item->getID() == id;
+    };
+
+    auto it = std::find_if(m_TimeIntervals.begin(), m_TimeIntervals.end(), predictate);
+
+    // if found, then delete it from the vector
+    if (m_TimeIntervals.end() != it)
+    {
+        m_TimeIntervals.erase(it);
+    }
+}
+
+const ProjectItem::TimeIntervalsContainerType & ProjectItem::getTimeIntervalsContainer() const
+{
+    return m_TimeIntervals;
 }
 
 void ProjectItem::setDescription(QString descr)
@@ -46,5 +81,10 @@ void ProjectItem::setName(QString name)
 QString ProjectItem::getName() const
 {
     return m_Name;
+}
+
+int ProjectItem::getID() const
+{
+    return m_ID;
 }
 

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,7 +16,8 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     ProjectItem.cpp \
     ItemsFactory.cpp \
-    TimeInterval.cpp
+    TimeInterval.cpp \
+    TaskItem.cpp
 
 HEADERS  += mainwindow.h \
     ItemsFactoryInterface.h \
@@ -24,7 +25,9 @@ HEADERS  += mainwindow.h \
     ProjectItemInterface.h \
     ItemsFactory.h \
     TimeIntervalInterface.h \
-    TimeInterval.h
+    TimeInterval.h \
+    TaskItemInterface.h \
+    TaskItem.h
 
 FORMS    += mainwindow.ui
 

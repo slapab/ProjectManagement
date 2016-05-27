@@ -6,21 +6,40 @@
 class TimeInterval : public virtual TimeIntervalInterface
 {
 public:
-    TimeInterval();
-    TimeInterval(QString name, QDateTime beginDate, QDateTime endDate);
+
+    TimeInterval(int id, int projectID, QString name, QString description, QDateTime beginDate, QDateTime endDate);
+    // todo: copy, move, assigment operator
+
     virtual ~TimeInterval();
 
-    std::pair<QDateTime, QDateTime> GetDatesRange() const override;
-    void setDatesRange(QDateTime begin, QDateTime end) override;
+    // Implements TimeInvervalInterface interface:
+public:
     void setBeginDate(QDateTime begin) override;
     void setEndDate(QDateTime end) override;
     void setName(QString name) override;
+    void setDescription(QString description) override;
+
     QString getName() const override;
+    QString getDescription() const override;
+    int  getProjectID() const override;
+    int  getID() const override;
+    std::pair<QDateTime, QDateTime> GetDates() const override;
+
+    void setTasksContainer(TasksContainerType &&container) override;
+    void addTask(std::unique_ptr<TaskItem> item) override;
+    void removeTask(int id) override;
+    const TasksContainerType & getTasksContainer() const override;
+
 
 protected:
-    QString m_Name;
-    QDateTime m_BeginDate;
-    QDateTime m_EndDate;
+    int         m_ID;
+    int         m_ProjectID;
+    QString     m_Name;
+    QString     m_Description;
+    QDateTime   m_BeginDate;
+    QDateTime   m_EndDate;
+
+    TasksContainerType m_Tasks;
 };
 
 #endif // TIMEINTERVAL_H
