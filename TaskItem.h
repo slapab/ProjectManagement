@@ -25,6 +25,10 @@ public:
     QString   getDescription() const override;
     std::pair<QDateTime, QDateTime> getDateRange() const override;
 
+
+protected:
+
+
 protected:
     int       m_ID;
     int       m_IntervalID;

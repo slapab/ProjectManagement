@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     ProjectItem.cpp \
     ItemsFactory.cpp \
     TimeInterval.cpp \
-    TaskItem.cpp
+    TaskItem.cpp \
+    SQLiteAccess.cpp
 
 HEADERS  += mainwindow.h \
     ItemsFactoryInterface.h \
@@ -27,7 +28,9 @@ HEADERS  += mainwindow.h \
     TimeIntervalInterface.h \
     TimeInterval.h \
     TaskItemInterface.h \
-    TaskItem.h
+    TaskItem.h \
+    DataStorageAccessInterface.h \
+    SQLiteAccess.h
 
 FORMS    += mainwindow.ui
 

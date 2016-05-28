@@ -6,6 +6,7 @@
 #include "ProjectItemInterface.h"
 #include "TimeInterval.h"
 
+
 class ProjectItem : public virtual ProjectItemInterface
 {
 public:
