@@ -14,7 +14,7 @@ TimeInterval::TimeInterval(int id, int projectID, QString name, QString descript
 TimeInterval::~TimeInterval()
 {}
 
-std::pair<QDateTime, QDateTime> TimeInterval::GetDates() const
+std::pair<QDateTime, QDateTime> TimeInterval::getDates() const
 {
     return std::pair<QDateTime, QDateTime>(m_BeginDate, m_EndDate);
 }
@@ -24,7 +24,7 @@ void TimeInterval::setTasksContainer(TimeIntervalInterface::TasksContainerType &
     m_Tasks = std::move(container);
 }
 
-void TimeInterval::addTask(std::unique_ptr<TaskItem> item)
+void TimeInterval::addTask(task_ptr_type item)
 {
     m_Tasks.push_back(std::move(item));
 }

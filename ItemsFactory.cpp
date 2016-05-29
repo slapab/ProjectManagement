@@ -9,14 +9,14 @@ ItemsFactory::ItemsFactory()
 ItemsFactory::~ItemsFactory()
 {}
 
-std::unique_ptr<ProjectItemInterface> ItemsFactory::GetProject(QString name, QString descr, QDate date)
+std::unique_ptr<ProjectItemInterface> ItemsFactory::GetProject(QString name, QString descr, QDateTime date)
 {
-    return std::make_unique<ProjectItem>(1, std::move(name), std::move(descr), std::move(date), QDate::currentDate());
+    return std::make_unique<ProjectItem>(1, std::move(name), std::move(descr), std::move(date), QDateTime::currentDateTime());
 }
 
 std::unique_ptr<ProjectItemInterface> ItemsFactory::GetProject()
 {
-    return std::make_unique<ProjectItem>(1, "", "", QDate::currentDate(), QDate::currentDate());
+    return std::make_unique<ProjectItem>(1, "", "", QDateTime::currentDateTime(), QDateTime::currentDateTime());
 }
 
 std::unique_ptr<TimeIntervalInterface> ItemsFactory::GetTimeInterval(QString name, QDateTime beginDate, QDateTime endDate)

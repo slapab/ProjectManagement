@@ -1,7 +1,7 @@
 #include "ProjectItem.h"
 
 
-ProjectItem::ProjectItem(int id, QString name, QString description, QDate beginDate, QDate endDate)
+ProjectItem::ProjectItem(int id, QString name, QString description, QDateTime beginDate, QDateTime endDate)
     : ProjectItemInterface()
     , m_ID(id)
     , m_Name(std::move(name))
@@ -11,20 +11,21 @@ ProjectItem::ProjectItem(int id, QString name, QString description, QDate beginD
     , m_TimeIntervals()
 {}
 
+
 ProjectItem::~ProjectItem()
 {}
 
-void ProjectItem::setBeginDate(QDate beginDate)
+void ProjectItem::setBeginDate(QDateTime beginDate)
 {
     m_CreationDate = std::move(beginDate);
 }
 
-void ProjectItem::setEndDate(QDate endDate)
+void ProjectItem::setEndDate(QDateTime endDate)
 {
     m_CreationDate = std::move(endDate);
 }
 
-std::pair<QDate, QDate> ProjectItem::getDates() const
+std::pair<QDateTime, QDateTime> ProjectItem::getDates() const
 {
     return std::make_pair(m_CreationDate, m_EndDate);
 }
@@ -34,7 +35,7 @@ void ProjectItem::setTimeIntervalsContainer(ProjectItemInterface::TimeIntervalsC
     m_TimeIntervals = std::move(storage);
 }
 
-void ProjectItem::addTimeInterval(std::unique_ptr<TimeInterval> item)
+void ProjectItem::addTimeInterval(timeint_ptr_type item)
 {
     m_TimeIntervals.push_back(std::move(item));
 }

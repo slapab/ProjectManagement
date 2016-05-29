@@ -6,12 +6,13 @@
 #include <utility> //std::pair
 #include <memory>  //std::memory
 
-#include "TaskItem.h"
+#include "TaskItemInterface.h"
 
 class TimeIntervalInterface
 {
 public:
-    using TasksContainerType = std::vector<std::unique_ptr<TaskItem>>;
+    using task_ptr_type = std::unique_ptr<TaskItemInterface>;
+    using TasksContainerType = std::vector<task_ptr_type>;
 
     TimeIntervalInterface() = default;
     virtual ~TimeIntervalInterface() {}
@@ -21,14 +22,14 @@ public:
     virtual void setName(QString name) = 0;
     virtual void setDescription(QString description) = 0;
 
-    virtual std::pair<QDateTime, QDateTime> GetDates() const = 0;
+    virtual std::pair<QDateTime, QDateTime> getDates() const = 0;
     virtual QString getName() const = 0;
     virtual QString getDescription() const = 0;
     virtual int  getProjectID() const = 0;
     virtual int  getID() const = 0;
 
     virtual void setTasksContainer(TasksContainerType && container) = 0;
-    virtual void addTask(std::unique_ptr<TaskItem> item) = 0;
+    virtual void addTask(task_ptr_type item) = 0;
     virtual void removeTask(int id) = 0;
     virtual const TasksContainerType & getTasksContainer() const = 0;
 };

@@ -23,7 +23,7 @@ public:
     int       getState() const override;
     QString   getName() const override;
     QString   getDescription() const override;
-    std::pair<QDateTime, QDateTime> getDateRange() const override;
+    std::pair<QDateTime, QDateTime> getDates() const override;
 
 
 protected:

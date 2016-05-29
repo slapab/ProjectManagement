@@ -23,10 +23,10 @@ public:
     QString getDescription() const override;
     int  getProjectID() const override;
     int  getID() const override;
-    std::pair<QDateTime, QDateTime> GetDates() const override;
+    std::pair<QDateTime, QDateTime> getDates() const override;
 
     void setTasksContainer(TasksContainerType &&container) override;
-    void addTask(std::unique_ptr<TaskItem> item) override;
+    void addTask(task_ptr_type item) override;
     void removeTask(int id) override;
     const TasksContainerType & getTasksContainer() const override;
 

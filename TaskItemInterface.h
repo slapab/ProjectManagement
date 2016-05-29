@@ -24,7 +24,7 @@ public:
     virtual int getState() const = 0;
     virtual QString getName() const = 0;
     virtual QString getDescription() const = 0;
-    virtual std::pair<QDateTime, QDateTime> getDateRange() const = 0;
+    virtual std::pair<QDateTime, QDateTime> getDates() const = 0;
 
 };
 

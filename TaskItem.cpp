@@ -74,7 +74,7 @@ QString TaskItem::getDescription() const
     return m_Description;
 }
 
-std::pair<QDateTime, QDateTime> TaskItem::getDateRange() const
+std::pair<QDateTime, QDateTime> TaskItem::getDates() const
 {
     return std::make_pair(m_BeginDate, m_EndDate);
 }

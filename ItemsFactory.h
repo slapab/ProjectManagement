@@ -11,7 +11,7 @@ public:
     virtual ~ItemsFactory();
 
 
-    std::unique_ptr<ProjectItemInterface> GetProject(QString name, QString descr, QDate date) override;
+    std::unique_ptr<ProjectItemInterface> GetProject(QString name, QString descr, QDateTime date) override;
     std::unique_ptr<ProjectItemInterface> GetProject() override;
 
     std::unique_ptr<TimeIntervalInterface> GetTimeInterval(QString name, QDateTime beginDate, QDateTime endDate) override;
