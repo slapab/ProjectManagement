@@ -69,8 +69,8 @@ public:
     void updateTaskItem(const task_ptr_type & task) override;
     void updateTimeInterval(const timeint_ptr_type & timeInterval) override;
     project_ptr_type addProject(QString name, QString descr, QDateTime beginDate, QDateTime endDate) override;
-    task_ptr_type addTaskItem(int intervalID, int priority,
-                     int state, QString name,
+    task_ptr_type addTaskItem(int intervalID, TaskPriority priority,
+                     TaskState state, QString name,
                      QString descr, QDateTime beginDate, QDateTime endDate) override;
     timeint_ptr_type addTimeInterval(int projectID, QString name, QString description, QDateTime beginDate, QDateTime endDate) override;
 

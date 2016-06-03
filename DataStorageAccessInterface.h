@@ -44,8 +44,8 @@ public:
 
     virtual project_ptr_type addProject(QString name, QString descr, QDateTime beginDate, QDateTime endDate) = 0;
     virtual task_ptr_type addTaskItem(
-            int intervalID, int priority,
-            int state, QString name,
+            int intervalID, TaskPriority priority,
+            TaskState state, QString name,
             QString descr, QDateTime beginDate, QDateTime endDate) = 0;
 
     virtual timeint_ptr_type addTimeInterval(int projectID, QString name, QString description, QDateTime beginDate, QDateTime endDate) = 0;

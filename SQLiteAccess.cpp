@@ -177,8 +177,8 @@ TasksContainerType SQLiteAccess::getTasks(const timeint_ptr_type &timeInterval)
                 (
                   query.value(0).toInt()        //get id
                 , timeInterval->getID()         //TimeIntervalID
-                , query.value(5).toInt()        //get priority
-                , query.value(6).toInt()        //get state
+                , static_cast<TaskPriority>(query.value(5).toInt()) //get priority
+                , static_cast<TaskState>(query.value(6).toInt())    //get state
                 , query.value(1).toString()     //get name
                 , query.value(2).toString()     //get description
                 , QDateTime::fromTime_t(query.value(3).toUInt()) //get begin date
@@ -292,8 +292,8 @@ void SQLiteAccess::updateTaskItem(const task_ptr_type &task)
     query.bindValue(":BEGDATE", dates.first.toTime_t());
     query.bindValue(":ENDDATE", dates.second.toTime_t());
     query.bindValue(":INTERVALID", task->getIntervalID());
-    query.bindValue(":PRIOR", task->getPriority());
-    query.bindValue(":STATE", task->getState());
+    query.bindValue(":PRIOR", static_cast<int>(task->getPriority()));
+    query.bindValue(":STATE", static_cast<int>(task->getState()));
 
     if (false == query.exec())
     {
@@ -374,8 +374,8 @@ project_ptr_type SQLiteAccess::addProject(QString name, QString descr, QDateTime
 }
 
 task_ptr_type SQLiteAccess::addTaskItem(
-                               int intervalID, int priority,
-                               int state, QString name,
+                               int intervalID, TaskPriority priority,
+                               TaskState state, QString name,
                                QString descr, QDateTime beginDate, QDateTime endDate)
 {
     QSqlQuery query(m_DB);
@@ -392,8 +392,8 @@ task_ptr_type SQLiteAccess::addTaskItem(
     query.bindValue(":DESCR", descr);
     query.bindValue(":BDATE", beginDate.toTime_t());
     query.bindValue(":EDATE", endDate.toTime_t());
-    query.bindValue(":PRIORITY", priority);
-    query.bindValue(":STATE", state);
+    query.bindValue(":PRIORITY", static_cast<int>(priority));
+    query.bindValue(":STATE", static_cast<int>(state));
 
     if (false == query.exec())
     {

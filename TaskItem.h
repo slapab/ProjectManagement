@@ -15,10 +15,10 @@ public:
     TaskItem(int id, int intervalID, TaskPriority priority, TaskState state, QString name, QString description, QDateTime beginDate, QDateTime endDate);
 
     TaskItem(const TaskItem &) = default;
-    TaskItem & operator(const TaskItem &) = default;
+    TaskItem & operator=(const TaskItem &) = default;
 
     TaskItem(TaskItem &&) = default;
-    TaskItem & operator(TaskItem &&) = default;
+    TaskItem & operator=(TaskItem &&) = default;
 
 
     // Implements TaskItemInterface interface:
