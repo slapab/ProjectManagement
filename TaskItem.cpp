@@ -1,6 +1,6 @@
 #include "TaskItem.h"
 
-TaskItem::TaskItem(int id, int intervalID, int priority, int state, QString name, QString description, QDateTime beginDate, QDateTime endDate)
+TaskItem::TaskItem(int id, int intervalID, TaskPriority priority, TaskState state, QString name, QString description, QDateTime beginDate, QDateTime endDate)
     : m_ID(id)
     , m_IntervalID(intervalID)
     , m_Priority(priority)
@@ -16,12 +16,18 @@ TaskItem::~TaskItem()
 
 void TaskItem::setName(QString name)
 {
-    m_Name = std::move(name);
+    if (false == name.isEmpty())
+    {
+        m_Name = std::move(name);
+    }
 }
 
 void TaskItem::setDescription(QString description)
 {
-    m_Description = std::move(description);
+    if (false == description.isEmpty())
+    {
+        m_Description = std::move(description);
+    }
 }
 
 void TaskItem::setBeginDate(QDateTime beginDate)
@@ -34,12 +40,12 @@ void TaskItem::setEndDate(QDateTime endDate)
     m_EndDate = std::move(endDate);
 }
 
-void TaskItem::setPriority(int priority)
+void TaskItem::setPriority(TaskPriority priority)
 {
     m_Priority = priority;
 }
 
-void TaskItem::setState(int state)
+void TaskItem::setState(TaskState state)
 {
     m_State = state;
 }
@@ -54,12 +60,12 @@ int TaskItem::getIntervalID() const
     return m_IntervalID;
 }
 
-int TaskItem::getPriority() const
+TaskPriority TaskItem::getPriority() const
 {
     return m_Priority;
 }
 
-int TaskItem::getState() const
+TaskState TaskItem::getState() const
 {
     return m_State;
 }
