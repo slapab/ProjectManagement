@@ -1,4 +1,7 @@
 #include "mainwindow.h"
+
+#include "UIMainWindow.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QDate>
@@ -8,59 +11,64 @@
 #include "SQLiteAccess.h"
 #include <memory>
 #include <utility>
+#include <QFrame>
 
 int main(int argc, char *argv[])
 {
-//    QApplication a(argc, argv);
+    QApplication a(argc, argv);
+    UIMainWindow w;
+    w.show();
 //    MainWindow w;
 //    w.show();
-//    return a.exec();
+    return a.exec();
 
 
-    {
-        using namespace sql_data_storage;
-        using namespace std;
-
-        SQLiteAccess dbStorage("./testdb.sqlite");
-        try
-        {
-            dbStorage.open();
 
 
-            { //add new project
-                QDateTime now = QDateTime::currentDateTime();
-                auto p =  dbStorage.addProject(
-                            "New Project", "Project Description", now, now.addDays(3)
-                            );
+//    {
+//        using namespace sql_data_storage;
+//        using namespace std;
 
-                qDebug() << "New project has been added" << p->getName() << " " << p->getID();
-            }
+//        SQLiteAccess dbStorage("./testdb.sqlite");
+//        try
+//        {
+//            dbStorage.open();
 
 
-            auto projs = dbStorage.getAllProjects();
-            qDebug() << projs.size();
+//            { //add new project
+//                QDateTime now = QDateTime::currentDateTime();
+//                auto p =  dbStorage.addProject(
+//                            "New Project", "Project Description", now, now.addDays(3)
+//                            );
 
-            for ( const auto & it : projs )
-            {
-                auto dates = it->getDates();
-                qDebug() << it->getName() << " " << it->getDescription() << " " << dates.second.toString();
+//                qDebug() << "New project has been added" << p->getName() << " " << p->getID();
+//            }
 
-                auto timeIntervals = dbStorage.getTimeIntervals(it);
 
-                for ( const auto & timeItem : timeIntervals )
-                {
-                    auto dates = timeItem->getDates();
-                    qDebug() << "\t" << timeItem->getName() << " " << dates.first.toString();
-                }
-            }
+//            auto projs = dbStorage.getAllProjects();
+//            qDebug() << projs.size();
 
-        }
-        catch( exceptions::SQLiteQueryException & e)
-        {
-            qDebug() << QString(e.what());
-        }
+//            for ( const auto & it : projs )
+//            {
+//                auto dates = it->getDates();
+//                qDebug() << it->getName() << " " << it->getDescription() << " " << dates.second.toString();
 
-    }
+//                auto timeIntervals = dbStorage.getTimeIntervals(it);
+
+//                for ( const auto & timeItem : timeIntervals )
+//                {
+//                    auto dates = timeItem->getDates();
+//                    qDebug() << "\t" << timeItem->getName() << " " << dates.first.toString();
+//                }
+//            }
+
+//        }
+//        catch( exceptions::SQLiteQueryException & e)
+//        {
+//            qDebug() << QString(e.what());
+//        }
+
+//    }
 
     return 0;
 }
