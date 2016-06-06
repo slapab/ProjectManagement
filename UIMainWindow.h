@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QLabel>
-#include <QTreeWidget>
+#include <QTreeView>
 #include <QSplitter>
 #include <QStackedWidget>
 #include <QPushButton>
@@ -16,9 +16,14 @@
 #include <QLineEdit>
 #include <QComboBox>
 
+#include "SQLiteAccess.h"
+
+using namespace sql_data_storage;
+
 class UIMainWindow : public QMainWindow
 {
     Q_OBJECT
+
 public:
     explicit UIMainWindow(QWidget *parent = nullptr);
 
@@ -126,7 +131,7 @@ private:
     QSplitter   * m_pDataSplitter {nullptr};
 
     /// Tree view for listing projects, time intervals and tasks
-    QTreeWidget * m_pTreeWidget {nullptr};
+    QTreeView * m_pTreeView {nullptr};
 
 
     /// #######################################################################
@@ -136,6 +141,12 @@ private:
 
 
     ItemInfoLayoutManager m_ItemInfoLayoutManager;
+
+
+    //#########################################################################
+    // non UI objects
+    SQLiteAccess m_SQLiteDBManager;
+
 };
 
 #endif // UIMAINWINDOW_H

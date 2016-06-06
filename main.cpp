@@ -6,12 +6,14 @@
 #include <QDebug>
 #include <QDate>
 #include "ProjectItem.h"
-#include "ItemsFactory.h"
 #include "TimeInterval.h"
 #include "SQLiteAccess.h"
 #include <memory>
 #include <utility>
 #include <QFrame>
+
+#include "TreeItemProject.h"
+#include "ItemsHierarchyBuilder.h"
 
 int main(int argc, char *argv[])
 {
@@ -59,8 +61,22 @@ int main(int argc, char *argv[])
 //                {
 //                    auto dates = timeItem->getDates();
 //                    qDebug() << "\t" << timeItem->getName() << " " << dates.first.toString();
+
+//                    auto tasks = dbStorage.getTasks(timeItem);
+//                    timeItem->setTasksContainer(std::move(tasks));
 //                }
+
+//                projs.front()->setTimeIntervalsContainer(std::move(timeIntervals));
+//                break;
 //            }
+
+//            ItemsHierarchyBuilder builder(dbStorage);
+
+//            auto projs = builder.buildWholeHierarchy();
+
+//            TreeItemProject treeItem(projs.front(), nullptr);
+//            qDebug() << treeItem.data(0).toString() << " intervals: " << treeItem.childCount()
+//                     << " children cnt: " << treeItem.child(0)->child(0)->data(0).toString();
 
 //        }
 //        catch( exceptions::SQLiteQueryException & e)

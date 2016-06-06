@@ -4,9 +4,12 @@
 #include <QCalendarWidget>
 #include "TaskItem.h"   // QMaps for strings connected with task status and priority
 
+#include "TreeModel.h"
+
 UIMainWindow::UIMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_ItemInfoLayoutManager(*this)
+    , m_SQLiteDBManager("./testdb.sqlite")
 {
     this->setupUI();
 }
@@ -36,9 +39,13 @@ void UIMainWindow::setupUI()
     m_pDataSplitter = new QSplitter();
     m_pDataLayout->addWidget(m_pDataSplitter);
 
-    m_pTreeWidget = new QTreeWidget();
-    // appned tree widget and info layout to the splitter
-    m_pDataSplitter->addWidget(m_pTreeWidget);
+    m_pTreeView = new QTreeView();
+
+
+    TreeModel * ownModel = new TreeModel(m_SQLiteDBManager);
+    m_pTreeView->setModel(ownModel);
+    // appned tree view and info layout to the splitter
+    m_pDataSplitter->addWidget(m_pTreeView);
 
     // append item info view widget to right space of splitter
     m_pDataSplitter->addWidget(m_ItemInfoLayoutManager.getItemInfoViewWidgets());
