@@ -22,7 +22,10 @@ SOURCES += main.cpp\
     TreeItemProject.cpp \
     TreeItemBase.cpp \
     TreeItemTimeInterval.cpp \
-    TreeItemTask.cpp
+    TreeItemTask.cpp \
+    TreeModel.cpp \
+    TreeItemRoot.cpp \
+    ItemsHierarchyBuilder.cpp
 
 HEADERS  += mainwindow.h \
     ProjectItem.h \
@@ -38,7 +41,10 @@ HEADERS  += mainwindow.h \
     TreeItemProject.h \
     TreeItemBase.h \
     TreeItemTimeInterval.h \
-    TreeItemTask.h
+    TreeItemTask.h \
+    TreeModel.h \
+    TreeItemRoot.h \
+    ItemsHierarchyBuilder.h
 
 FORMS    += mainwindow.ui
 
