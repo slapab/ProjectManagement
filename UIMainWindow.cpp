@@ -1,6 +1,9 @@
 #include "UIMainWindow.h"
 #include <memory> // std::unique_ptr
 
+#include <QCalendarWidget>
+#include "TaskItem.h"   // QMaps for strings connected with task status and priority
+
 UIMainWindow::UIMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_ItemInfoLayoutManager(*this)
@@ -40,10 +43,9 @@ void UIMainWindow::setupUI()
     // append item info view widget to right space of splitter
     m_pDataSplitter->addWidget(m_ItemInfoLayoutManager.getItemInfoViewWidgets());
     // Set item info layout to default
-    m_ItemInfoLayoutManager.setCurrentLayout(ItemInfoLayoutManager::InfoLayoutType::Default);
+    m_ItemInfoLayoutManager.setCurrentLayout(ItemInfoLayoutManager::InfoLayoutType::ItemInfo);
 
     // #######################################
-
 
 }
 
@@ -70,31 +72,21 @@ UIMainWindow::ItemInfoLayoutManager::ItemInfoLayoutManager(UIMainWindow & parent
     m_pItemInfoViewWidgets = new QStackedWidget();
 
     this->createDefaultInfoLayout();
-    this->createProjectInfoLayout();
-    this->createTaskInfoLayout();
-    this->createTimeIntervalInfoLayout();
+    this->createEmptyInfoLayout();
 
     m_pItemInfoViewWidgets->addWidget(this->m_pDefaultInfoWidget);
-    m_pItemInfoViewWidgets->addWidget(this->m_pProjectInfoWidget);
-    m_pItemInfoViewWidgets->addWidget(this->m_pTaskInfoWidget);
-    m_pItemInfoViewWidgets->addWidget(this->m_pTimeIntervalInfoWidget);
+    m_pItemInfoViewWidgets->addWidget(this->m_pEmptyInfoWidget);
 }
 
 void UIMainWindow::ItemInfoLayoutManager::setCurrentLayout(const InfoLayoutType type)
 {
     switch (type)
     {
-    case InfoLayoutType::Default :
+    case InfoLayoutType::ItemInfo :
         this->switchCurrentWidget(m_pDefaultInfoWidget);
         break;
-    case InfoLayoutType::Task :
-        this->switchCurrentWidget(m_pTaskInfoWidget);
-        break;
-    case InfoLayoutType::Project:
-        this->switchCurrentWidget(m_pProjectInfoWidget);
-        break;
-    case InfoLayoutType::TimeInterval:
-        this->switchCurrentWidget(m_pTimeIntervalInfoWidget);
+    case InfoLayoutType::Empty :
+        this->switchCurrentWidget(m_pEmptyInfoWidget);
         break;
     default:
         break;
@@ -112,46 +104,106 @@ void UIMainWindow::ItemInfoLayoutManager::createDefaultInfoLayout()
 {
     m_pDefaultInfoWidget = new QWidget();
     m_pDefaultLayout = new QGridLayout();
+        m_pDefaultLayout->setHorizontalSpacing(0);
 
     m_pDefaultInfoWidget->setLayout(m_pDefaultLayout);
 
-    m_pDefaultLabel = new QLabel("Defaultowa labeleczka");
-    m_pDefaultLayout->addWidget(m_pDefaultLabel,0,1,1,2);
+    // common view testing
+    m_pItemTypeLabel = new QLabel("Item type: ");
 
-    //todo implement rest
+    // #######################################################
+    // Create name input and its label
+    m_pItemNameEdit = new QLineEdit();
+    m_pItemNameEdit->setFrame(false);
+    m_pItemNameEdit->setPlaceholderText("Item name");
+    m_pItemNameEdit->setStyleSheet("background-color:White;");
+    m_pItemNameEdit->setTextMargins(3,3,3,3);
+        auto pNameLabel = new QLabel("<b>Name: </b>");
+        pNameLabel->setMargin(3);
+        pNameLabel->setStyleSheet("background-color:White;");
+    //#######################################################
+
+    //#######################################################
+    // Create date -time edit for begin and end date
+    m_pItemBeginDateEdit = new QDateTimeEdit();
+    m_pItemBeginDateEdit->setToolTip("Begin date");
+    m_pItemBeginDateEdit->setCalendarPopup(true);
+    m_pItemBeginDateEdit->calendarWidget()->setGridVisible(true);
+
+    m_pItemEndDateEdit = new QDateTimeEdit();
+    m_pItemEndDateEdit->setToolTip("End date");
+    m_pItemEndDateEdit->setCalendarPopup(true);
+    m_pItemEndDateEdit->calendarWidget()->setGridVisible(true);
+
+
+
+    //#######################################################
+    // Create the text edit widget for description
+    m_pItemDescrEdit = new QTextEdit();
+    m_pItemDescrEdit->setPlaceholderText("Item description");
+    //#######################################################
+
+    //#######################################################
+    // Create multiline label for additional info for selected item.
+    // This is used only with project and timeinterval items, for task
+    // item this is hidden.
+    m_pAdditionalInfo = new QLabel();
+//    m_pAdditionalInfo->hide();
+    //#######################################################
+
+    //#######################################################
+    // Create combobox for task status and task priority
+    m_pTaskStatusCombo = new QComboBox();
+    m_pTaskStatusCombo->hide();
+    for (const auto & i : TaskItem::STATE_STRINGS.keys())
+    {
+        m_pTaskStatusCombo->addItem(i);
+    }
+
+    m_pTaskPriorityCombo = new QComboBox();
+    m_pTaskPriorityCombo->hide();
+    for (const auto & i : TaskItem::PRIORITY_STRINGS.keys())
+    {
+        m_pTaskPriorityCombo->addItem(i);
+    }
+    //#######################################################
+
+
+    //#######################################################
+    // Create buttons
+    m_pSaveButton = new QPushButton("Save");
+    //#######################################################
+
+
+    //#######################################################
+    // Set widgets in layout
+
+    m_pDefaultLayout->addWidget(m_pItemTypeLabel, 0, 0, 1, 1);
+
+
+    m_pDefaultLayout->addWidget(m_pItemNameEdit, 1, 1, 1, 5);
+    m_pDefaultLayout->addWidget(pNameLabel, 1, 0, 1, 1);
+
+    m_pDefaultLayout->addWidget(m_pItemBeginDateEdit, 3, 0, 1, 3);
+    m_pDefaultLayout->addWidget(m_pItemEndDateEdit, 3, 3, 1, 3);
+
+    m_pDefaultLayout->addWidget(m_pAdditionalInfo, 5, 0, 2, 6);
+    m_pDefaultLayout->addWidget(m_pTaskStatusCombo, 5, 0, 1, 2);
+    m_pDefaultLayout->addWidget(m_pTaskPriorityCombo, 5, 3, 1, 2);
+
+    m_pDefaultLayout->addWidget(m_pItemDescrEdit, 7, 0, 1, 6);
+
+    m_pDefaultLayout->addWidget(m_pSaveButton, 8, 5, 1, 1);
+
+    //#######################################################
 }
 
-void UIMainWindow::ItemInfoLayoutManager::createTaskInfoLayout()
+void UIMainWindow::ItemInfoLayoutManager::createEmptyInfoLayout()
 {
-    m_pTaskInfoWidget = new QWidget();
-    m_pTaskLayout = new QGridLayout();
+    m_pEmptyInfoWidget = new QWidget();
+    m_pEmptyInfoLayout = new QGridLayout();
 
-    m_pTaskInfoWidget->setLayout(m_pTaskLayout);
-
-    //TODO implement the rest
-}
-
-void UIMainWindow::ItemInfoLayoutManager::createTimeIntervalInfoLayout()
-{
-    m_pTimeIntervalInfoWidget = new QWidget();
-    m_pTimeIntLayout = new QGridLayout();
-
-    m_pTimeIntervalInfoWidget->setLayout(m_pTimeIntLayout);
-
-    //TODO implement the rest
-}
-
-void UIMainWindow::ItemInfoLayoutManager::createProjectInfoLayout()
-{
-    m_pProjectInfoWidget = new QWidget();
-    m_pProjectLayout = new QGridLayout();
-
-    m_pProjectInfoWidget->setLayout(m_pProjectLayout);
-
-    m_pProjectLabel = new QLabel("Projektu labelka");
-    m_pProjectLayout->addWidget(m_pProjectLabel, 1, 1, 1, 2);
-
-    //TODO implement rest
+    m_pEmptyInfoWidget->setLayout(m_pEmptyInfoLayout);
 }
 
 void UIMainWindow::ItemInfoLayoutManager::switchCurrentWidget(QWidget *widget)

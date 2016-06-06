@@ -10,6 +10,11 @@
 #include <QTreeWidget>
 #include <QSplitter>
 #include <QStackedWidget>
+#include <QPushButton>
+#include <QDateTimeEdit>
+#include <QTextEdit>
+#include <QLineEdit>
+#include <QComboBox>
 
 class UIMainWindow : public QMainWindow
 {
@@ -39,10 +44,8 @@ protected:
     public:
         enum class InfoLayoutType
         {
-            Default,
-            Task,
-            TimeInterval,
-            Project
+             ItemInfo
+            ,Empty
         };
 
     public:
@@ -67,10 +70,7 @@ protected:
         // helper methods
     protected:
         void createDefaultInfoLayout();
-        void createTaskInfoLayout();
-        void createTimeIntervalInfoLayout();
-        void createProjectInfoLayout();
-
+        void createEmptyInfoLayout();
         void switchCurrentWidget(QWidget * widget);
 
         // Members
@@ -80,35 +80,36 @@ protected:
 
         bool m_NeedDeleteStckedWidget {true};
 
-        // Members for default layout - when none item is selected
+
+        // Members for common item view layout
     protected:
-        QWidget * m_pDefaultInfoWidget;
+        QLabel        * m_pItemTypeLabel {nullptr};
+        QLineEdit     * m_pItemNameEdit {nullptr};
+        QDateTimeEdit * m_pItemBeginDateEdit {nullptr};
+        QDateTimeEdit * m_pItemEndDateEdit {nullptr};
+
+        QLabel      * m_pAdditionalInfo {nullptr};
+        QComboBox   * m_pTaskStatusCombo {nullptr};
+        QComboBox   * m_pTaskPriorityCombo {nullptr};
+
+        QTextEdit   * m_pItemDescrEdit {nullptr};
+
+        QPushButton * m_pSaveButton {nullptr};
+
+        // Members for default layout
+    protected:
         QGridLayout * m_pDefaultLayout;
-        QLabel * m_pDefaultLabel {nullptr};
+        QWidget     * m_pDefaultInfoWidget;
 
-        // Members for layout to show task information layout
+        // Members for empty layout - when none item is selected
     protected:
-        QWidget * m_pTaskInfoWidget;
-        QGridLayout * m_pTaskLayout;
-        QLabel * m_pTaskLabel {nullptr};
+        QGridLayout * m_pEmptyInfoLayout;
+        QWidget     * m_pEmptyInfoWidget;
 
-        // Memebers for layout to show time interval information
-    protected:
-        QWidget * m_pTimeIntervalInfoWidget;
-        QGridLayout * m_pTimeIntLayout;
-        QLabel * m_pTimeIntLabel {nullptr};
-
-        // Members for layout to show project information
-    protected:
-        QWidget * m_pProjectInfoWidget;
-        QGridLayout * m_pProjectLayout;
-        QLabel * m_pProjectLabel {nullptr};
 
     };
 
 private:
-//    QGridLayout * m_pMainLayout {nullptr};
-
     /// This widget represents custom application layout it must be created and it is
     /// using to set custom layout in QMainWindow class.
     QWidget     * m_pCentralWidget {nullptr};
@@ -127,8 +128,6 @@ private:
     /// Tree view for listing projects, time intervals and tasks
     QTreeWidget * m_pTreeWidget {nullptr};
 
-//    // widget used for storing layouts for all available item 'views' (for default, project, task, time interval)
-//    QStackedWidget * m_pInfoItemWidgets {nullptr};
 
     /// #######################################################################
 
