@@ -18,7 +18,11 @@ SOURCES += main.cpp\
     TimeInterval.cpp \
     TaskItem.cpp \
     SQLiteAccess.cpp \
-    UIMainWindow.cpp
+    UIMainWindow.cpp \
+    TreeItemProject.cpp \
+    TreeItemBase.cpp \
+    TreeItemTimeInterval.cpp \
+    TreeItemTask.cpp
 
 HEADERS  += mainwindow.h \
     ProjectItem.h \
@@ -29,7 +33,12 @@ HEADERS  += mainwindow.h \
     TaskItem.h \
     DataStorageAccessInterface.h \
     SQLiteAccess.h \
-    UIMainWindow.h
+    UIMainWindow.h \
+    TreeItemInterface.h \
+    TreeItemProject.h \
+    TreeItemBase.h \
+    TreeItemTimeInterval.h \
+    TreeItemTask.h
 
 FORMS    += mainwindow.ui
 
