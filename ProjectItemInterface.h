@@ -11,8 +11,9 @@
 class ProjectItemInterface
 {
 public:
-    using timeint_ptr_type = std::unique_ptr<TimeIntervalInterface>;
-    using TimeIntervalsContainerType = std::vector<timeint_ptr_type>;
+    using project_ptr_type = std::unique_ptr<ProjectItemInterface>;
+    using TimeIntervalsContainerType = TimeIntervalInterface::TimeIntervalsContainerType;
+    using timeint_ptr_type = TimeIntervalInterface::timeint_ptr_type;
 
     ProjectItemInterface() = default;
     virtual ~ProjectItemInterface() {}

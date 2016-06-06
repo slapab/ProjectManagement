@@ -11,6 +11,9 @@
 class TimeIntervalInterface
 {
 public:
+    using timeint_ptr_type = std::unique_ptr<TimeIntervalInterface>;
+    using TimeIntervalsContainerType = std::vector<timeint_ptr_type>;
+
     using task_ptr_type = std::unique_ptr<TaskItemInterface>;
     using TasksContainerType = std::vector<task_ptr_type>;
 
