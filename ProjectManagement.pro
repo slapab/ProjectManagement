@@ -15,17 +15,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     ProjectItem.cpp \
-    ItemsFactory.cpp \
     TimeInterval.cpp \
     TaskItem.cpp \
     SQLiteAccess.cpp \
     UIMainWindow.cpp
 
 HEADERS  += mainwindow.h \
-    ItemsFactoryInterface.h \
     ProjectItem.h \
     ProjectItemInterface.h \
-    ItemsFactory.h \
     TimeIntervalInterface.h \
     TimeInterval.h \
     TaskItemInterface.h \
