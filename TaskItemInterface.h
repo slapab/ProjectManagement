@@ -16,7 +16,7 @@ enum class TaskPriority
 
 enum class TaskState
 {
-    NotStarted = 1, /// Default state on task creation.
+    Originated = 1, /// Default state on task creation.
     Investigation,  /// Task is being investigated.
     Blocked,        /// Task can not be accomplished because something it blocks.
     InProgress,     /// Work on task is in progress.

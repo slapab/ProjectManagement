@@ -1,5 +1,23 @@
 #include "TaskItem.h"
 
+// Init static fields
+QMap<QString, TaskPriority> TaskItem::PRIORITY_STRINGS =
+{
+      {"Low", TaskPriority::Low}
+    , {"Normal", TaskPriority::Normal }
+    , {"Urgent", TaskPriority::Urgent }
+};
+
+QMap<QString, TaskState> TaskItem::STATE_STRINGS =
+{
+      {"Originated", TaskState::Originated}
+    , {"Investigation", TaskState::Investigation}
+    , {"Blocked", TaskState::Blocked}
+    , {"In progress", TaskState::InProgress}
+    , {"Done", TaskState::Done}
+};
+
+
 TaskItem::TaskItem(int id, int intervalID, TaskPriority priority, TaskState state, QString name, QString description, QDateTime beginDate, QDateTime endDate)
     : m_ID(id)
     , m_IntervalID(intervalID)

@@ -1,6 +1,7 @@
 #ifndef TASKITEM_H
 #define TASKITEM_H
 
+#include <QMap>
 #include "TaskItemInterface.h"
 
 /**
@@ -10,6 +11,9 @@
 class TaskItem : public TaskItemInterface
 {
 public:
+    static QMap<QString, TaskPriority> PRIORITY_STRINGS;
+    static QMap<QString, TaskState>    STATE_STRINGS;
+
     virtual ~TaskItem();
 
     TaskItem(int id, int intervalID, TaskPriority priority, TaskState state, QString name, QString description, QDateTime beginDate, QDateTime endDate);
