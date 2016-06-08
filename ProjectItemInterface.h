@@ -7,8 +7,9 @@
 #include <vector>
 
 #include "TimeIntervalInterface.h"
+#include "ItemInterface.h"
 
-class ProjectItemInterface
+class ProjectItemInterface : public ItemInterface
 {
 public:
     using project_ptr_type = std::unique_ptr<ProjectItemInterface>;
@@ -17,16 +18,6 @@ public:
 
     ProjectItemInterface() = default;
     virtual ~ProjectItemInterface() {}
-
-    virtual void setBeginDate(QDateTime beginDate) = 0;
-    virtual void setEndDate(QDateTime endDate) = 0;
-    virtual void setDescription(QString descr) = 0;
-    virtual void setName(QString name) = 0;
-
-    virtual std::pair<QDateTime, QDateTime> getDates() const = 0;
-    virtual QString getDescription() const = 0;
-    virtual QString getName() const = 0;
-    virtual int     getID() const = 0;
 
     virtual void setTimeIntervalsContainer(TimeIntervalsContainerType && container) = 0;
     virtual void addTimeInterval(timeint_ptr_type item) = 0;

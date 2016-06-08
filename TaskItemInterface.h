@@ -3,7 +3,8 @@
 
 #include <QString>
 #include <QDateTime>
-#include <utility> // std::pair
+
+#include <ItemInterface.h>
 
 
 enum class TaskPriority
@@ -27,7 +28,7 @@ enum class TaskState
 /**
 *   \brief              This an interface for task item.
 */
-class TaskItemInterface
+class TaskItemInterface : public ItemInterface
 {
 public:
     virtual ~TaskItemInterface() = default;
@@ -40,30 +41,6 @@ public:
     TaskItemInterface & operator=(TaskItemInterface &&) = default;
 
     /**
-    *   \brief          Provides way to change new name.
-    *   \param name     new name string which can not be empty.
-    */
-    virtual void setName(QString name) = 0;
-
-    /**
-    *   \brief          Provides way to change new description.
-    *   \param description  new description string which can not be empty.
-    */
-    virtual void setDescription(QString description) = 0;
-
-    /**
-    *   \brief          Provides way to change the begin date.
-    *   \param beginDate    object which represents the begin date.
-    */
-    virtual void setBeginDate(QDateTime beginDate) = 0;
-
-    /**
-    *   \brief          Provides way to change the end date.
-    *   \param endDate  object which represents the end date.
-    */
-    virtual void setEndDate(QDateTime endDate) = 0;
-
-    /**
     *   \brief          Provides way to change the task priority.
     *   \param priority the priority value which must be one of these defined in \ref TaskPriority enum.
     */
@@ -74,13 +51,6 @@ public:
     *   \param state    the state value which must be one of these defined in \ref TaskState enum.
     */
     virtual void setState(TaskState state) = 0;
-
-
-    /**
-    *   \brief          Returns task ID. This ID represents the primary key in database.
-    *   \return         Task ID.
-    */
-    virtual int getID() const = 0;
 
     /**
     *   \brief          Returns interval time ID to which task is assigned to. This ID represents
@@ -100,24 +70,6 @@ public:
     *   \return         Value of \ref TaskState enum.
     */
     virtual TaskState getState() const = 0;
-
-    /**
-    *   \brief          Return task name.
-    *   \return         String which represents task name.
-    */
-    virtual QString getName() const = 0;
-
-    /**
-    *   \brief          Return task description.
-    *   \return         String which represents task description.
-    */
-    virtual QString getDescription() const = 0;
-
-    /**
-    *   \brief          Return task begin and end dates.
-    *   \return         Pair of begin and end date. The first is begin date. The second is end date.
-    */
-    virtual std::pair<QDateTime, QDateTime> getDates() const = 0;
 
 };
 

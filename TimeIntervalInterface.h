@@ -8,7 +8,9 @@
 
 #include "TaskItemInterface.h"
 
-class TimeIntervalInterface
+#include "ItemInterface.h"
+
+class TimeIntervalInterface : public ItemInterface
 {
 public:
     using timeint_ptr_type = std::unique_ptr<TimeIntervalInterface>;
@@ -20,16 +22,7 @@ public:
     TimeIntervalInterface() = default;
     virtual ~TimeIntervalInterface() {}
 
-    virtual void setBeginDate(QDateTime begin) = 0;
-    virtual void setEndDate(QDateTime end) = 0;
-    virtual void setName(QString name) = 0;
-    virtual void setDescription(QString description) = 0;
-
-    virtual std::pair<QDateTime, QDateTime> getDates() const = 0;
-    virtual QString getName() const = 0;
-    virtual QString getDescription() const = 0;
     virtual int  getProjectID() const = 0;
-    virtual int  getID() const = 0;
 
     virtual void setTasksContainer(TasksContainerType && container) = 0;
     virtual void addTask(task_ptr_type item) = 0;

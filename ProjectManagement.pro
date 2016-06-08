@@ -44,7 +44,8 @@ HEADERS  += mainwindow.h \
     TreeItemTask.h \
     TreeModel.h \
     TreeItemRoot.h \
-    ItemsHierarchyBuilder.h
+    ItemsHierarchyBuilder.h \
+    ItemInterface.h
 
 FORMS    += mainwindow.ui
 
