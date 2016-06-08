@@ -62,7 +62,7 @@ void UIMainWindow::setupUI()
     // append item info view widget to right space of splitter
     m_pDataSplitter->addWidget(m_ItemInfoLayoutManager.getItemInfoViewWidgets());
     // Set item info layout to default
-    m_ItemInfoLayoutManager.setCurrentLayout(ItemInfoLayoutManager::InfoLayoutType::ItemInfo);
+    m_ItemInfoLayoutManager.setCurrentLayout(ItemInfoLayoutManager::InfoLayoutType::Empty);
 
     // #######################################
 
@@ -74,6 +74,7 @@ void UIMainWindow::connectUISignals()
 {
    QObject::connect(m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged
                    , this, &UIMainWindow::treeItemSelected);
+
 }
 
 UIMainWindow::SelectedItemType UIMainWindow::whichItemSelected(const QModelIndex & index)
@@ -106,26 +107,39 @@ UIMainWindow::SelectedItemType UIMainWindow::whichItemSelected(const QModelIndex
     return type;
 }
 
-void UIMainWindow::treeItemSelected(const QItemSelection &selected, const QItemSelection &deselected)
+void UIMainWindow::treeItemSelected(const QItemSelection &selected, const QItemSelection &)
 {
     auto index = selected.indexes().at(0);
 
+    if (false == index.isValid())
+    {
+        return;
+    }
 
+    // set current layout to item view layout
+    m_ItemInfoLayoutManager.setCurrentLayout(ItemInfoLayoutManager::InfoLayoutType::ItemInfo);
+
+
+    auto * pTreeItemI = TreeModel::GetInternalPointer(index);
     auto type = whichItemSelected(index);
 
     if (SelectedItemType::Project == type)
     {
-        auto * pTI = TreeModel::GetInternalPointer(index);
-        auto & item = pTI->getUnderlaidData();
+        auto & item = dynamic_cast<ProjectItemInterface &>(pTreeItemI->getUnderlaidData());
 
-        this->m_ItemInfoLayoutManager.m_pItemNameEdit->setText(item.getName());
-        this->m_ItemInfoLayoutManager.m_pItemDescrEdit->setText(item.getDescription());
-//        statusBar()->showMessage(QString("Project: ").append(pTI->data(0).toString())
-//                                 .append(item.getDescription()));
+        m_ItemInfoLayoutManager.fillItemInfoLayout(item);
     }
-    else
+    else if (SelectedItemType::TimeInterval == type)
     {
-        statusBar()->showMessage(QString("Nie wiadomo"));
+        auto & item = dynamic_cast<TimeIntervalInterface &>(pTreeItemI->getUnderlaidData());
+
+        m_ItemInfoLayoutManager.fillItemInfoLayout(item);
+    }
+    else if (SelectedItemType::Task == type)
+    {
+        auto & item = dynamic_cast<TaskItemInterface &>(pTreeItemI->getUnderlaidData());
+
+        m_ItemInfoLayoutManager.fillItemInfoLayout(item);
     }
 }
 
@@ -174,7 +188,6 @@ QStackedWidget *UIMainWindow::ItemInfoLayoutManager::getItemInfoViewWidgets()
     m_NeedDeleteStckedWidget = false;
     return this->m_pItemInfoViewWidgets;
 }
-
 
 void UIMainWindow::ItemInfoLayoutManager::createDefaultInfoLayout()
 {
@@ -291,4 +304,74 @@ void UIMainWindow::ItemInfoLayoutManager::switchCurrentWidget(QWidget *widget)
 
     // switch to requeted widget
     this->m_pItemInfoViewWidgets->setCurrentWidget(widget);
+}
+
+
+void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const ProjectItemInterface & projItem)
+{
+    m_pItemTypeLabel->setText("Item type: <i>Project</i>");
+    m_pItemNameEdit->setText(projItem.getName());
+    m_pItemDescrEdit->setText(projItem.getDescription());
+
+    auto dates = projItem.getDates();
+    m_pItemBeginDateEdit->setDateTime(dates.first);
+    m_pItemEndDateEdit->setDateTime(dates.second);
+
+    // Show additional info Label
+    m_pTaskStatusCombo->hide();
+    m_pTaskPriorityCombo->hide();
+    m_pAdditionalInfo->show();
+
+    size_t timeIntsCount = projItem.getTimeIntervalsContainer().size();
+    size_t tasksCount = 0;
+
+    for ( const auto & timeIntItem : projItem.getTimeIntervalsContainer())
+    {
+            tasksCount += timeIntItem->getTasksContainer().size();
+    }
+
+    m_pAdditionalInfo->setText(QString("Assigned time intervals: %1\n"
+                                       "Total assigned tasks: %2")
+                                        .arg(timeIntsCount)
+                                        .arg(tasksCount)
+                                      );
+}
+
+void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TimeIntervalInterface & timeintItem)
+{
+    m_pItemTypeLabel->setText("Item type: <i>Time interval</i>");
+    m_pItemNameEdit->setText(timeintItem.getName());
+    m_pItemDescrEdit->setText(timeintItem.getDescription());
+
+    auto dates = timeintItem.getDates();
+    m_pItemBeginDateEdit->setDateTime(dates.first);
+    m_pItemEndDateEdit->setDateTime(dates.second);
+
+    // Show additional info Label
+    m_pTaskStatusCombo->hide();
+    m_pTaskPriorityCombo->hide();
+    m_pAdditionalInfo->show();
+
+    // get tasks count
+    QString taskCount = QString::number(timeintItem.getTasksContainer().size());
+    m_pAdditionalInfo->setText(QString("Assigned tasks: ").append(taskCount));
+}
+
+void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TaskItemInterface & taskItem)
+{
+    m_pItemTypeLabel->setText("Item type: <i>Task</i>");
+    m_pItemNameEdit->setText(taskItem.getName());
+    m_pItemDescrEdit->setText(taskItem.getDescription());
+
+    auto dates = taskItem.getDates();
+    m_pItemBeginDateEdit->setDateTime(dates.first);
+    m_pItemEndDateEdit->setDateTime(dates.second);
+
+    // Hide additional info Label
+    m_pAdditionalInfo->hide();
+    m_pTaskStatusCombo->show();
+    m_pTaskPriorityCombo->show();
+
+    m_pTaskStatusCombo->setCurrentText(TaskItem::STATE_STRINGS.key(static_cast<TaskState>(taskItem.getState())));
+    m_pTaskPriorityCombo->setCurrentText(TaskItem::PRIORITY_STRINGS.key(static_cast<TaskPriority>(taskItem.getPriority())));
 }

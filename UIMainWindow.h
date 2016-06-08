@@ -82,6 +82,10 @@ protected:
          */
         QStackedWidget * getItemInfoViewWidgets();
 
+        void fillItemInfoLayout(const ProjectItemInterface & projItem);
+        void fillItemInfoLayout(const TaskItemInterface & taskItem);
+        void fillItemInfoLayout(const TimeIntervalInterface & timeIntItem);
+
         // helper methods
     protected:
         void createDefaultInfoLayout();
