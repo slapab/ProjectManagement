@@ -81,19 +81,22 @@ public:
     *   \brief  Performs project's data update in data storage. The data to be updated
     *           are stored inside pointer to project item object passed by reference.
     */
-    virtual void upadteProject(const project_ptr_type & proj) = 0;
-    
+    virtual void updateProject(const project_ptr_type & proj) = 0; //TODO remove this (cppiso standard)
+    virtual void updateProject(const ProjectItemInterface * proj) = 0;
+
     /**
     *   \brief  Performs task's data update in data storage. The data to be updated
     *           are stored inside pointer to task item object passed by reference.
     */
-    virtual void updateTaskItem(const task_ptr_type & task) = 0;
+    virtual void updateTaskItem(const task_ptr_type & task) = 0; //TODO remove this (cppiso standard)
+    virtual void updateTaskItem(const TaskItemInterface * task) = 0;
 
     /**
     *   \brief  Performs time interval's data update in data storage. The data to be updated
     *           are stored inside pointer to time interval item object passed by reference.
     */
-    virtual void updateTimeInterval(const timeint_ptr_type & timeInterval) = 0;
+    virtual void updateTimeInterval(const timeint_ptr_type & timeInterval) = 0; //TODO remove this (cppiso standard)
+    virtual void updateTimeInterval(const TimeIntervalInterface * timeInterval) = 0;
 
     /**
     *   \brief  Adds new project data to data storage and returns the object filled with

@@ -65,9 +65,13 @@ public:
     ProjectsContainerType getAllProjects() override;
     TasksContainerType getTasks(const timeint_ptr_type & timeInterval) override;
     TimeIntContainerType getTimeIntervals(const project_ptr_type & proj) override;
-    void upadteProject(const project_ptr_type & proj) override;
+    void updateProject(const project_ptr_type & proj) override;
+    void updateProject(const ProjectItemInterface * proj) override;
     void updateTaskItem(const task_ptr_type & task) override;
+    void updateTaskItem(const TaskItemInterface * task) override;
     void updateTimeInterval(const timeint_ptr_type & timeInterval) override;
+    void updateTimeInterval(const TimeIntervalInterface * timeInterval) override;
+
     project_ptr_type addProject(QString name, QString descr, QDateTime beginDate, QDateTime endDate) override;
     task_ptr_type addTaskItem(int intervalID, TaskPriority priority,
                      TaskState state, QString name,

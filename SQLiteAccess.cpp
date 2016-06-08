@@ -240,18 +240,28 @@ TimeIntContainerType SQLiteAccess::getTimeIntervals(const project_ptr_type &proj
     return intervals;
 }
 
-void SQLiteAccess::upadteProject(const project_ptr_type &proj)
+void SQLiteAccess::updateProject(const project_ptr_type & proj)
 {
+    updateProject(proj.get());
+}
+
+void SQLiteAccess::updateProject(const ProjectItemInterface * proj)
+{
+    if (nullptr == proj)
+    {
+        return;
+    }
+
     QSqlQuery query(m_DB);
 
     query.prepare(
                 "UPDATE projects_table SET "
-                " name=':NAME' "
-                ", description=':DESCR' "
-                ", create_date=':CREATEDATE' "
-                ", end_date=':ENDDATE' "
+                " name=(:NAME) "
+                ", description=(:DESCR) "
+                ", create_date=(:CREATEDATE) "
+                ", end_date=(:ENDDATE) "
                 " WHERE "
-                " project_id = ':PROJID'"
+                " project_id = (:PROJID)"
                 );
 
     query.bindValue(":PROJID", proj->getID());
@@ -268,20 +278,31 @@ void SQLiteAccess::upadteProject(const project_ptr_type &proj)
     }
 }
 
+
 void SQLiteAccess::updateTaskItem(const task_ptr_type &task)
 {
+    updateTaskItem(task.get());
+}
+
+void SQLiteAccess::updateTaskItem(const TaskItemInterface * task)
+{
+    if (nullptr == task)
+    {
+        return ;
+    }
+
     QSqlQuery query(m_DB);
 
     query.prepare(
                 "UPDATE tasks_table SET "
-                " name=':NAME' "
-                ", description=':DESCR' "
-                ", begin_date=':BEGDATE' "
-                ", end_date=':ENDDATE' "
-                ", interval_id=':INTERVALID' "
-                ", priorit=':PRIOR' "
-                ", state=':STATE' "
-                " WHERE task_id = ':TASKID'"
+                " name=(:NAME) "
+                ", description=(:DESCR) "
+                ", begin_date=(:BEGDATE) "
+                ", end_date=(:ENDDATE) "
+                ", interval_id=(:INTERVALID) "
+                ", priority=(:PRIOR) "
+                ", state=(:STATE) "
+                " WHERE task_id = (:TASKID)"
                 );
 
     query.bindValue(":TASKID", task->getID());
@@ -301,18 +322,28 @@ void SQLiteAccess::updateTaskItem(const task_ptr_type &task)
     }
 }
 
-void SQLiteAccess::updateTimeInterval(const timeint_ptr_type &timeInterval)
+void SQLiteAccess::updateTimeInterval(const timeint_ptr_type & timeInterval)
 {
+    updateTimeInterval(timeInterval.get());
+}
+
+void SQLiteAccess::updateTimeInterval(const TimeIntervalInterface * timeInterval) //TODO isocpp not_null
+{
+    if (nullptr == timeInterval)
+    {
+        return;
+    }
+
     QSqlQuery query(m_DB);
 
     query.prepare(
                 "UPDATE intervals_table SET "
-                " name=':NAME' "
-                ", description=':DESCR' "
-                ", begin_date=':BEGDATE' "
-                ", end_date=':ENDDATE' "
-                ", project_id=':PROJID' "
-                " WHERE interval_id = ':INTERVALID'"
+                " name=(:NAME) "
+                ", description=(:DESCR) "
+                ", begin_date=(:BEGDATE) "
+                ", end_date=(:ENDDATE) "
+                ", project_id=(:PROJID) "
+                " WHERE interval_id = (:INTERVALID)"
                 );
 
     query.bindValue(":INTERVALID", timeInterval->getID());
@@ -384,7 +415,7 @@ task_ptr_type SQLiteAccess::addTaskItem(
                 "INSERT INTO tasks_table "
                 " (interval_id, name, description, begin_date, end_date, priority, state) "
                 " VALUES "
-                " (:INTID, :NAME, :DESCR, :BDATE, :EDATE, :PRIORITY, :STATE)"
+                " ((:INTID), (:NAME), (:DESCR), (:BDATE), (:EDATE), (:PRIORITY), (:STATE))"
                 );
 
     query.bindValue(":INTID", intervalID);

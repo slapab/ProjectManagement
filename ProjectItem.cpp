@@ -22,7 +22,7 @@ void ProjectItem::setBeginDate(QDateTime beginDate)
 
 void ProjectItem::setEndDate(QDateTime endDate)
 {
-    m_CreationDate = std::move(endDate);
+    m_EndDate = std::move(endDate);
 }
 
 std::pair<QDateTime, QDateTime> ProjectItem::getDates() const

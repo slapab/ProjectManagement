@@ -34,7 +34,7 @@ public:
 public:
     enum class SelectedItemType {Project, TimeInterval, Task, None};
 
-signals:
+
 
 private slots:
     void treeItemSelected(const QItemSelection &selected, const QItemSelection &deselected);
@@ -76,21 +76,34 @@ protected:
          */
         void setCurrentLayout(const InfoLayoutType type);
 
+        void connectUISignals();
+
         /**
          * @brief getItemInfoViewWidgets. It transfers the ownership.
          * @return
          */
         QStackedWidget * getItemInfoViewWidgets();
 
+
+
         void fillItemInfoLayout(const ProjectItemInterface & projItem);
         void fillItemInfoLayout(const TaskItemInterface & taskItem);
         void fillItemInfoLayout(const TimeIntervalInterface & timeIntItem);
+
+        void saveButtonAction(ItemInterface * pItem, bool save);
+
 
         // helper methods
     protected:
         void createDefaultInfoLayout();
         void createEmptyInfoLayout();
         void switchCurrentWidget(QWidget * widget);
+
+        void syncWithWidgets(ProjectItemInterface * proj);
+        void syncWithWidgets(TimeIntervalInterface * timeInt);
+        void syncWithWidgets(TaskItemInterface * task);
+        // Synchronize only common data
+        void commonSyncWithWidgets(ItemInterface * item);
 
         // Members
     private:

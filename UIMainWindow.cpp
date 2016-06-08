@@ -166,6 +166,8 @@ UIMainWindow::ItemInfoLayoutManager::ItemInfoLayoutManager(UIMainWindow & parent
 
     m_pItemInfoViewWidgets->addWidget(this->m_pDefaultInfoWidget);
     m_pItemInfoViewWidgets->addWidget(this->m_pEmptyInfoWidget);
+
+    this->connectUISignals();
 }
 
 void UIMainWindow::ItemInfoLayoutManager::setCurrentLayout(const InfoLayoutType type)
@@ -181,6 +183,19 @@ void UIMainWindow::ItemInfoLayoutManager::setCurrentLayout(const InfoLayoutType 
     default:
         break;
     }
+}
+
+void UIMainWindow::ItemInfoLayoutManager::connectUISignals()
+{
+    QObject::connect(this->m_pSaveButton, &QPushButton::clicked,
+                    [this](bool checked)
+                    {
+                        auto selIdx = m_Parent.m_pTreeView->selectionModel()->selection().indexes().at(0);
+                        auto & selItem = TreeModel::GetInternalPointer(selIdx)->getUnderlaidData();
+
+                        this->saveButtonAction(&selItem, false /*this is an update action*/);
+                    }
+                    );
 }
 
 QStackedWidget *UIMainWindow::ItemInfoLayoutManager::getItemInfoViewWidgets()
@@ -306,7 +321,6 @@ void UIMainWindow::ItemInfoLayoutManager::switchCurrentWidget(QWidget *widget)
     this->m_pItemInfoViewWidgets->setCurrentWidget(widget);
 }
 
-
 void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const ProjectItemInterface & projItem)
 {
     m_pItemTypeLabel->setText("Item type: <i>Project</i>");
@@ -357,6 +371,7 @@ void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TimeIntervalI
     m_pAdditionalInfo->setText(QString("Assigned tasks: ").append(taskCount));
 }
 
+
 void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TaskItemInterface & taskItem)
 {
     m_pItemTypeLabel->setText("Item type: <i>Task</i>");
@@ -374,4 +389,97 @@ void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TaskItemInter
 
     m_pTaskStatusCombo->setCurrentText(TaskItem::STATE_STRINGS.key(static_cast<TaskState>(taskItem.getState())));
     m_pTaskPriorityCombo->setCurrentText(TaskItem::PRIORITY_STRINGS.key(static_cast<TaskPriority>(taskItem.getPriority())));
+}
+
+
+void UIMainWindow::ItemInfoLayoutManager::commonSyncWithWidgets(ItemInterface * item)
+{
+    item->setName(m_pItemNameEdit->text());
+    item->setDescription(m_pItemDescrEdit->toPlainText());
+    item->setBeginDate(m_pItemBeginDateEdit->dateTime());
+    item->setEndDate(m_pItemEndDateEdit->dateTime());
+}
+
+void UIMainWindow::ItemInfoLayoutManager::syncWithWidgets(ProjectItemInterface * proj)
+{
+    commonSyncWithWidgets(static_cast<ItemInterface*>(proj));
+}
+
+void UIMainWindow::ItemInfoLayoutManager::syncWithWidgets(TimeIntervalInterface * timeInt)
+{
+    commonSyncWithWidgets(static_cast<ItemInterface*>(timeInt));
+}
+
+void UIMainWindow::ItemInfoLayoutManager::syncWithWidgets(TaskItemInterface * task)
+{
+    // sync common part
+    commonSyncWithWidgets(static_cast<ItemInterface*>(task));
+
+    // sync custom data
+    QString priorityText = m_pTaskPriorityCombo->currentText();
+    task->setPriority(TaskItem::PRIORITY_STRINGS.value(priorityText));
+
+    QString stateText = m_pTaskStatusCombo->currentText();
+    task->setState(TaskItem::STATE_STRINGS.value(stateText));
+}
+
+// actions
+
+void UIMainWindow::ItemInfoLayoutManager::saveButtonAction(ItemInterface * pItem, bool save)
+{
+    if (false == save)
+    // update in data storage
+    {
+        try {
+            m_Parent.m_SQLiteDBManager.open();
+
+            // Check if it is project item
+            auto * pProjItem = dynamic_cast<ProjectItemInterface*>(pItem);
+            if (nullptr != pProjItem)
+            {
+                // Synchronize UI widgets data with underlaid object data
+                syncWithWidgets(pProjItem);
+                // update in database
+                m_Parent.m_SQLiteDBManager.updateProject(pProjItem);
+            }
+            else
+            {
+                // check if it is time interval
+                auto * pTimeItem = dynamic_cast<TimeIntervalInterface*>(pItem);
+                if (nullptr != pTimeItem)
+                {
+                    // Synchronize UI widgets data with underlaid object data
+                    syncWithWidgets(pTimeItem);
+                    // update in database
+                    m_Parent.m_SQLiteDBManager.updateTimeInterval(pTimeItem);
+                }
+                else
+                {
+                    // check if it is task
+                    auto * pTaskItem = dynamic_cast<TaskItemInterface*>(pItem);
+                    if (nullptr != pTaskItem)
+                    {
+                        // Synchronize UI widgets data with underlaid object data
+                        syncWithWidgets(pTaskItem);
+                        // update in database
+                        m_Parent.m_SQLiteDBManager.updateTaskItem(pTaskItem);
+                    }
+                }
+            }
+
+            m_Parent.m_SQLiteDBManager.close();
+
+            m_Parent.statusBar()->showMessage("Update succeeded");
+        }
+        catch(...)
+        {
+            m_Parent.statusBar()->showMessage("Update failed");
+        }
+    }
+    // Handle adding new item into database
+    else
+    {
+        //TODO
+    }
+
 }
