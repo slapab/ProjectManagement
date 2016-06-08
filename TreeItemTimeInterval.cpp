@@ -21,4 +21,9 @@ QVariant TreeItemTimeInterval::data(int column) const
     return QVariant(m_TimeIntervalItem->getName());
 }
 
+ItemInterface & TreeItemTimeInterval::getUnderlaidData()
+{
+    return *m_TimeIntervalItem.get();
+}
+
 

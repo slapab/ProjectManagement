@@ -5,6 +5,10 @@
 #include "TaskItem.h"   // QMaps for strings connected with task status and priority
 
 #include "TreeModel.h"
+#include "TreeItemBase.h"
+
+#include <QStatusBar>
+#include <QItemSelection>
 
 UIMainWindow::UIMainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,8 +16,16 @@ UIMainWindow::UIMainWindow(QWidget *parent)
     , m_SQLiteDBManager("./testdb.sqlite")
 {
     this->setupUI();
+    this->connectUISignals();
 }
 
+UIMainWindow::~UIMainWindow()
+{
+    if (nullptr != m_pCentralWidget )
+    {
+        delete m_pCentralWidget;
+    }
+}
 
 void UIMainWindow::setupUI()
 {
@@ -27,7 +39,7 @@ void UIMainWindow::setupUI()
     // Set custom layout to central space in QMainWindow class
     this->setCentralWidget(m_pCentralWidget);
 
-    this->setGeometry(100,100, 300,300);
+    this->setGeometry(300,300, 600,400);
 
     // #######################################
     // Create and prepare layout to store:
@@ -58,7 +70,64 @@ void UIMainWindow::setupUI()
 
 
 
+void UIMainWindow::connectUISignals()
+{
+   QObject::connect(m_pTreeView->selectionModel(), &QItemSelectionModel::selectionChanged
+                   , this, &UIMainWindow::treeItemSelected);
+}
 
+UIMainWindow::SelectedItemType UIMainWindow::whichItemSelected(const QModelIndex & index)
+{
+    int i = 0;
+    auto tidx = index;
+    while (true == tidx.isValid())
+    {
+        tidx = tidx.parent();
+        ++i;
+    }
+
+    SelectedItemType type = SelectedItemType::None;
+
+    switch(i)
+    {
+    case 1:
+        type = SelectedItemType::Project;
+        break;
+    case 2:
+        type = SelectedItemType::TimeInterval;
+        break;
+    case 3:
+        type = SelectedItemType::Task;
+        break;
+    default:
+        break;
+    }
+
+    return type;
+}
+
+void UIMainWindow::treeItemSelected(const QItemSelection &selected, const QItemSelection &deselected)
+{
+    auto index = selected.indexes().at(0);
+
+
+    auto type = whichItemSelected(index);
+
+    if (SelectedItemType::Project == type)
+    {
+        auto * pTI = TreeModel::GetInternalPointer(index);
+        auto & item = pTI->getUnderlaidData();
+
+        this->m_ItemInfoLayoutManager.m_pItemNameEdit->setText(item.getName());
+        this->m_ItemInfoLayoutManager.m_pItemDescrEdit->setText(item.getDescription());
+//        statusBar()->showMessage(QString("Project: ").append(pTI->data(0).toString())
+//                                 .append(item.getDescription()));
+    }
+    else
+    {
+        statusBar()->showMessage(QString("Nie wiadomo"));
+    }
+}
 
 // ######################################################
 // Implementation for inner class

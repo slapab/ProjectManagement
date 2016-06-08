@@ -15,6 +15,7 @@ public:
     // TreeItemInterface interface
 public:
     QVariant data(int column) const override;
+    ItemInterface & getUnderlaidData() override;
 
 private:
     const project_ptr_type & m_ProjectItem;

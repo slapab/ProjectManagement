@@ -4,6 +4,7 @@
 #include <memory> // for std::unique_ptr
 #include <QVariant>
 
+#include "ItemInterface.h"
 
 class TreeItemInterface
 {
@@ -19,6 +20,7 @@ public:
     virtual int childNumber(const std::unique_ptr<TreeItemInterface> & child) const = 0;
     virtual int childNumber(const TreeItemInterface * const child) const = 0;
     virtual TreeItemInterface * parent() = 0;
+    virtual ItemInterface & getUnderlaidData() = 0;
 //    virtual bool insertChildren(int position, int count, int columns) = 0;
 //    virtual bool insertColumns(int position, int columns) = 0;
 //    virtual bool removeChildren(int position, int count) = 0;

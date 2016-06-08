@@ -16,10 +16,11 @@ public:
     // TreeItemInterface interface
 public:
     QVariant data(int column) const override;
-
+    ItemInterface & getUnderlaidData() override;
 
 private:
     const task_ptr_type & m_TaskItem;
+
 };
 
 #endif // TREEITEMTASK_H

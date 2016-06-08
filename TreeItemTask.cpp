@@ -11,3 +11,8 @@ QVariant TreeItemTask::data(int column) const
 {
     return QVariant(m_TaskItem->getName());
 }
+
+ItemInterface & TreeItemTask::getUnderlaidData()
+{
+    return *m_TaskItem.get();
+}

@@ -14,10 +14,10 @@ public:
     // TreeItemInterface interface
 public:
     QVariant data(int column) const override;
+    ItemInterface & getUnderlaidData() override;
 
 private:
     const timeint_ptr_type & m_TimeIntervalItem;
-
 };
 
 #endif // TREEITEMTIMEINTERVAL_H

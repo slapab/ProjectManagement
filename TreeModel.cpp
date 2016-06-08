@@ -17,6 +17,17 @@ TreeModel::TreeModel(DataStorageAccessInterface & dataAccessObject)
     m_rootItem = std::make_unique<TreeItemRoot>(m_DataHierarchy, std::move(rootData));
 }
 
+
+TreeItemInterface * TreeModel::GetInternalPointer(const QModelIndex &index)
+{
+    if (!index.isValid())
+    {
+        return nullptr;
+    }
+
+    return static_cast<TreeItemInterface *>(index.internalPointer());
+}
+
 QVariant TreeModel::data(const QModelIndex & index, int role) const
 {
     if (!index.isValid())

@@ -17,11 +17,13 @@ public:
     // TreeItemInterface interface
 public:
     QVariant data(int column) const override;
+    ItemInterface & getUnderlaidData() override;
 
 
 private:
     const ProjectsContainerType & m_ProjectsContainer;
     QList<QVariant> m_RootData;
+
 };
 
 #endif // TREEITEMROOT_H

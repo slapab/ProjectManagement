@@ -1,5 +1,6 @@
 #include "TreeItemBase.h"
 #include <algorithm>
+#include <exception>
 
 TreeItemBase::TreeItemBase(TreeItemInterface * parent)
     : m_pParent(parent)
@@ -25,7 +26,8 @@ int TreeItemBase::childCount() const
 
 int TreeItemBase::columnCount() const
 {
-    return 1;
+    return 1; // First represent item name, second is the QVariant with
+              // UniquePtrForQVariant class that store refernece to the unique_ptr of TreeItem_x_
 }
 
 
@@ -77,3 +79,5 @@ int TreeItemBase::childNumber(const TreeItemInterface * const child) const
 
     return 0;
 }
+
+

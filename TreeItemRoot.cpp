@@ -24,4 +24,10 @@ QVariant TreeItemRoot::data(int column) const
     return m_RootData.value(column);
 }
 
+ItemInterface & TreeItemRoot::getUnderlaidData()
+{
+    // this is not allowed so throw exception
+    throw std::out_of_range("Root node has not underlaid data");
+}
+
 

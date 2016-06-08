@@ -20,6 +20,8 @@
 
 using namespace sql_data_storage;
 
+class QItemSelection;
+
 class UIMainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -27,13 +29,21 @@ class UIMainWindow : public QMainWindow
 public:
     explicit UIMainWindow(QWidget *parent = nullptr);
 
+    ~UIMainWindow();
+
+public:
+    enum class SelectedItemType {Project, TimeInterval, Task, None};
+
 signals:
 
-public slots:
+private slots:
+    void treeItemSelected(const QItemSelection &selected, const QItemSelection &deselected);
 
 private:
     void setupUI() ;
+    void connectUISignals();
 
+    SelectedItemType whichItemSelected(const QModelIndex & index);
 
 protected:
     /**
@@ -87,7 +97,7 @@ protected:
 
 
         // Members for common item view layout
-    protected:
+    public:
         QLabel        * m_pItemTypeLabel {nullptr};
         QLineEdit     * m_pItemNameEdit {nullptr};
         QDateTimeEdit * m_pItemBeginDateEdit {nullptr};

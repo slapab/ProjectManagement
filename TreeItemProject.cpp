@@ -7,7 +7,7 @@ TreeItemProject::TreeItemProject(const project_ptr_type & projItem, TreeItemInte
     : TreeItemBase(parent)
     , m_ProjectItem(projItem)
 {
-    const auto & timeIntervals = m_ProjectItem->getTimeIntervalsContainer();
+    auto & timeIntervals = projItem->getTimeIntervalsContainer();
 
     for (const auto & item : timeIntervals)
     {
@@ -18,5 +18,10 @@ TreeItemProject::TreeItemProject(const project_ptr_type & projItem, TreeItemInte
 QVariant TreeItemProject::data(int column) const
 {
     return QVariant(m_ProjectItem->getName());
+}
+
+ItemInterface & TreeItemProject::getUnderlaidData()
+{
+    return *m_ProjectItem.get();
 }
 
