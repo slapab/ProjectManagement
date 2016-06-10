@@ -86,9 +86,9 @@ protected:
 
 
 
-        void fillItemInfoLayout(const ProjectItemInterface & projItem);
-        void fillItemInfoLayout(const TaskItemInterface & taskItem);
-        void fillItemInfoLayout(const TimeIntervalInterface & timeIntItem);
+        void fillItemInfoLayout(const ProjectItemInterface & projItem, const QModelIndex & index);
+        void fillItemInfoLayout(const TaskItemInterface & taskItem, const QModelIndex & index);
+        void fillItemInfoLayout(const TimeIntervalInterface & timeIntItem, const QModelIndex & index);
 
         void saveButtonAction(ItemInterface & pItem, bool save);
 

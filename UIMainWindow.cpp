@@ -133,19 +133,19 @@ void UIMainWindow::treeItemSelected(const QItemSelection &selected, const QItemS
     {
         auto & item = dynamic_cast<ProjectItemInterface &>(pTreeItemI->getUnderlaidData());
 
-        m_ItemInfoLayoutManager.fillItemInfoLayout(item);
+        m_ItemInfoLayoutManager.fillItemInfoLayout(item, index);
     }
     else if (SelectedItemType::TimeInterval == type)
     {
         auto & item = dynamic_cast<TimeIntervalInterface &>(pTreeItemI->getUnderlaidData());
 
-        m_ItemInfoLayoutManager.fillItemInfoLayout(item);
+        m_ItemInfoLayoutManager.fillItemInfoLayout(item, index);
     }
     else if (SelectedItemType::Task == type)
     {
         auto & item = dynamic_cast<TaskItemInterface &>(pTreeItemI->getUnderlaidData());
 
-        m_ItemInfoLayoutManager.fillItemInfoLayout(item);
+        m_ItemInfoLayoutManager.fillItemInfoLayout(item, index);
     }
 }
 
@@ -327,7 +327,7 @@ void UIMainWindow::ItemInfoLayoutManager::switchCurrentWidget(QWidget *widget)
     this->m_pItemInfoViewWidgets->setCurrentWidget(widget);
 }
 
-void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const ProjectItemInterface & projItem)
+void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const ProjectItemInterface & projItem, const QModelIndex & index)
 {
     m_pItemTypeLabel->setText("Item type: <i>Project</i>");
     m_pItemNameEdit->setText(projItem.getName());
@@ -342,12 +342,14 @@ void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const ProjectItemIn
     m_pTaskPriorityCombo->hide();
     m_pAdditionalInfo->show();
 
-    size_t timeIntsCount = projItem.getTimeIntervalsContainer().size();
-    size_t tasksCount = 0;
+    // read how many time intervals and tasks it has
+    auto * treeItem = TreeModel::GetInternalPointer(index);
+    size_t timeIntsCount = treeItem->childCount();
 
-    for ( const auto & timeIntItem : projItem.getTimeIntervalsContainer())
+    size_t tasksCount = 0;
+    for (size_t i = 0; i < timeIntsCount; ++i)
     {
-            tasksCount += timeIntItem->getTasksContainer().size();
+        tasksCount += treeItem->child(i)->childCount();
     }
 
     m_pAdditionalInfo->setText(QString("Assigned time intervals: %1\n"
@@ -357,7 +359,7 @@ void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const ProjectItemIn
                                       );
 }
 
-void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TimeIntervalInterface & timeintItem)
+void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TimeIntervalInterface & timeintItem, const QModelIndex & index)
 {
     m_pItemTypeLabel->setText("Item type: <i>Time interval</i>");
     m_pItemNameEdit->setText(timeintItem.getName());
@@ -373,12 +375,13 @@ void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TimeIntervalI
     m_pAdditionalInfo->show();
 
     // get tasks count
-    QString taskCount = QString::number(timeintItem.getTasksContainer().size());
+    auto * treeItem = TreeModel::GetInternalPointer(index);
+    QString taskCount = QString::number(treeItem->childCount());
     m_pAdditionalInfo->setText(QString("Assigned tasks: ").append(taskCount));
 }
 
 
-void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TaskItemInterface & taskItem)
+void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TaskItemInterface & taskItem, const QModelIndex & index)
 {
     m_pItemTypeLabel->setText("Item type: <i>Task</i>");
     m_pItemNameEdit->setText(taskItem.getName());
