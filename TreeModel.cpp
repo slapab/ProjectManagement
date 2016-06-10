@@ -8,13 +8,8 @@ TreeModel::TreeModel(DataStorageAccessInterface & dataAccessObject)
     QList<QVariant> rootData;
     rootData << "Projects" << "Time intervals" << "Tasks";
 
-    // create hierarchy objects with data read from database
-    // and store them in a private member of this class
-    ItemsHierarchyBuilder dataBuilder(m_DataAccessObject);
-    m_DataHierarchy = std::move(dataBuilder.buildWholeHierarchy());
-
-    // create tree model based on read data - just reference data, don't copy them
-    m_rootItem = std::make_unique<TreeItemRoot>(m_DataHierarchy, std::move(rootData));
+    // create tree model based on data which can be retrieved from m_DataAccessObject
+    m_rootItem = std::make_unique<TreeItemRoot>(std::move(rootData), m_DataAccessObject);
 }
 
 

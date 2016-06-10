@@ -1,27 +1,23 @@
 #ifndef TREEITEMROOT_H
 #define TREEITEMROOT_H
 
-#include "TreeItemBase.h"
-#include "DataStorageAccessInterface.h"
+#include "TreeItem.h"
 
 #include <QList>
 #include <QVariant>
 
-class TreeItemRoot : public TreeItemBase
+class TreeItemRoot : public TreeItem
 {
 public:
-    using ProjectsContainerType = DataStorageAccessInterface::ProjectsContainerType;
+    explicit TreeItemRoot(QList<QVariant> && data, DataStorageAccessInterface & dataAccessObject);
 
-    explicit TreeItemRoot(const ProjectsContainerType & projects, QList<QVariant> && data);
-
-    // TreeItemInterface interface
+    // Custom implementation of TreeItem methods
 public:
-    QVariant data(int column) const override;
-    ItemInterface & getUnderlaidData() override;
+    QVariant data(int column) const;
+    ItemInterface & getUnderlaidData();
 
 
 private:
-    const ProjectsContainerType & m_ProjectsContainer;
     QList<QVariant> m_RootData;
 
 };
