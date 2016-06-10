@@ -63,14 +63,12 @@ public:
     void open() override;
     void close() override;
     ProjectsContainerType getAllProjects() override;
-    TasksContainerType getTasks(const timeint_ptr_type & timeInterval) override;
-    TimeIntContainerType getTimeIntervals(const project_ptr_type & proj) override;
-    void updateProject(const project_ptr_type & proj) override;
-    void updateProject(const ProjectItemInterface * proj) override;
-    void updateTaskItem(const task_ptr_type & task) override;
-    void updateTaskItem(const TaskItemInterface * task) override;
-    void updateTimeInterval(const timeint_ptr_type & timeInterval) override;
-    void updateTimeInterval(const TimeIntervalInterface * timeInterval) override;
+    TasksContainerType getTasks(const TimeIntervalInterface &timeInterval) override;
+    TimeIntContainerType getTimeIntervals(const ProjectItemInterface &proj) override;
+
+    void updateProject(const ProjectItemInterface & proj) override;
+    void updateTaskItem(const TaskItemInterface & task) override;
+    void updateTimeInterval(const TimeIntervalInterface & timeInterval) override;
 
     project_ptr_type addProject(QString name, QString descr, QDateTime beginDate, QDateTime endDate) override;
     task_ptr_type addTaskItem(int intervalID, TaskPriority priority,
@@ -92,6 +90,7 @@ protected:
 
     QString      m_SQLitePath;  /// Path to the SQLite database file
     QSqlDatabase m_DB;          /// SQLite Database object
+
 
 };
 

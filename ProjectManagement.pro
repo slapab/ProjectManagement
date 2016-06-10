@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     TreeItemTask.cpp \
     TreeModel.cpp \
     TreeItemRoot.cpp \
-    ItemsHierarchyBuilder.cpp
+    ItemsHierarchyBuilder.cpp \
+    TreeItem.cpp
 
 HEADERS  += mainwindow.h \
     ProjectItem.h \
@@ -45,7 +46,8 @@ HEADERS  += mainwindow.h \
     TreeModel.h \
     TreeItemRoot.h \
     ItemsHierarchyBuilder.h \
-    ItemInterface.h
+    ItemInterface.h \
+    TreeItem.h
 
 FORMS    += mainwindow.ui
 

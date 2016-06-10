@@ -144,9 +144,8 @@ ProjectsContainerType SQLiteAccess::getAllProjects()
     return projects;
 }
 
-TasksContainerType SQLiteAccess::getTasks(const timeint_ptr_type &timeInterval)
+DataStorageAccessInterface::TasksContainerType SQLiteAccess::getTasks(const TimeIntervalInterface &timeInterval)
 {
-
     QSqlQuery query(m_DB);
     query.prepare(
         "SELECT "
@@ -158,7 +157,7 @@ TasksContainerType SQLiteAccess::getTasks(const timeint_ptr_type &timeInterval)
         );
 
     // get only tasks that are assigned to the given time interval
-    query.bindValue(":id", timeInterval->getID());
+    query.bindValue(":id", timeInterval.getID());
 
     if (false == query.exec())
     {
@@ -176,7 +175,7 @@ TasksContainerType SQLiteAccess::getTasks(const timeint_ptr_type &timeInterval)
         auto obj = std::make_unique<TaskItem>
                 (
                   query.value(0).toInt()        //get id
-                , timeInterval->getID()         //TimeIntervalID
+                , timeInterval.getID()         //TimeIntervalID
                 , static_cast<TaskPriority>(query.value(5).toInt()) //get priority
                 , static_cast<TaskState>(query.value(6).toInt())    //get state
                 , query.value(1).toString()     //get name
@@ -193,7 +192,9 @@ TasksContainerType SQLiteAccess::getTasks(const timeint_ptr_type &timeInterval)
     return tasks;
 }
 
-TimeIntContainerType SQLiteAccess::getTimeIntervals(const project_ptr_type &proj)
+
+
+DataStorageAccessInterface::TimeIntContainerType SQLiteAccess::getTimeIntervals(const ProjectItemInterface &proj)
 {
 
     QSqlQuery query(m_DB);
@@ -207,7 +208,7 @@ TimeIntContainerType SQLiteAccess::getTimeIntervals(const project_ptr_type &proj
         );
 
     // bind the project name
-    query.bindValue(":id", proj->getID());
+    query.bindValue(":id", proj.getID());
 
     if (false == query.exec())
     {
@@ -225,7 +226,7 @@ TimeIntContainerType SQLiteAccess::getTimeIntervals(const project_ptr_type &proj
         auto obj = std::make_unique<TimeInterval>
                 (
                   query.value(0).toInt()        //get id
-                , proj->getID()                 //save project ID
+                , proj.getID()                 //save project ID
                 , query.value(1).toString()     //get priority
                 , query.value(2).toString()     //get state
                 , QDateTime::fromTime_t(query.value(3).toUInt()) //get begin date
@@ -240,17 +241,9 @@ TimeIntContainerType SQLiteAccess::getTimeIntervals(const project_ptr_type &proj
     return intervals;
 }
 
-void SQLiteAccess::updateProject(const project_ptr_type & proj)
-{
-    updateProject(proj.get());
-}
 
-void SQLiteAccess::updateProject(const ProjectItemInterface * proj)
+void SQLiteAccess::updateProject(const ProjectItemInterface & proj)
 {
-    if (nullptr == proj)
-    {
-        return;
-    }
 
     QSqlQuery query(m_DB);
 
@@ -264,11 +257,11 @@ void SQLiteAccess::updateProject(const ProjectItemInterface * proj)
                 " project_id = (:PROJID)"
                 );
 
-    query.bindValue(":PROJID", proj->getID());
-    query.bindValue(":NAME", proj->getName());
-    query.bindValue(":DESCR", proj->getDescription());
+    query.bindValue(":PROJID", proj.getID());
+    query.bindValue(":NAME", proj.getName());
+    query.bindValue(":DESCR", proj.getDescription());
 
-    std::pair<QDateTime, QDateTime> dates = proj->getDates();
+    std::pair<QDateTime, QDateTime> dates = proj.getDates();
     query.bindValue(":CREATEDATE", dates.first.toTime_t());
     query.bindValue(":ENDDATE", dates.second.toTime_t());
 
@@ -279,17 +272,8 @@ void SQLiteAccess::updateProject(const ProjectItemInterface * proj)
 }
 
 
-void SQLiteAccess::updateTaskItem(const task_ptr_type &task)
+void SQLiteAccess::updateTaskItem(const TaskItemInterface & task)
 {
-    updateTaskItem(task.get());
-}
-
-void SQLiteAccess::updateTaskItem(const TaskItemInterface * task)
-{
-    if (nullptr == task)
-    {
-        return ;
-    }
 
     QSqlQuery query(m_DB);
 
@@ -305,16 +289,16 @@ void SQLiteAccess::updateTaskItem(const TaskItemInterface * task)
                 " WHERE task_id = (:TASKID)"
                 );
 
-    query.bindValue(":TASKID", task->getID());
-    query.bindValue(":NAME", task->getName());
-    query.bindValue(":DESCR", task->getDescription());
+    query.bindValue(":TASKID", task.getID());
+    query.bindValue(":NAME", task.getName());
+    query.bindValue(":DESCR", task.getDescription());
 
-    auto dates = task->getDates();
+    auto dates = task.getDates();
     query.bindValue(":BEGDATE", dates.first.toTime_t());
     query.bindValue(":ENDDATE", dates.second.toTime_t());
-    query.bindValue(":INTERVALID", task->getIntervalID());
-    query.bindValue(":PRIOR", static_cast<int>(task->getPriority()));
-    query.bindValue(":STATE", static_cast<int>(task->getState()));
+    query.bindValue(":INTERVALID", task.getIntervalID());
+    query.bindValue(":PRIOR", static_cast<int>(task.getPriority()));
+    query.bindValue(":STATE", static_cast<int>(task.getState()));
 
     if (false == query.exec())
     {
@@ -322,17 +306,9 @@ void SQLiteAccess::updateTaskItem(const TaskItemInterface * task)
     }
 }
 
-void SQLiteAccess::updateTimeInterval(const timeint_ptr_type & timeInterval)
-{
-    updateTimeInterval(timeInterval.get());
-}
 
-void SQLiteAccess::updateTimeInterval(const TimeIntervalInterface * timeInterval) //TODO isocpp not_null
+void SQLiteAccess::updateTimeInterval(const TimeIntervalInterface & timeInterval)
 {
-    if (nullptr == timeInterval)
-    {
-        return;
-    }
 
     QSqlQuery query(m_DB);
 
@@ -346,14 +322,14 @@ void SQLiteAccess::updateTimeInterval(const TimeIntervalInterface * timeInterval
                 " WHERE interval_id = (:INTERVALID)"
                 );
 
-    query.bindValue(":INTERVALID", timeInterval->getID());
-    query.bindValue(":NAME", timeInterval->getName());
-    query.bindValue(":DESCR", timeInterval->getDescription());
+    query.bindValue(":INTERVALID", timeInterval.getID());
+    query.bindValue(":NAME", timeInterval.getName());
+    query.bindValue(":DESCR", timeInterval.getDescription());
 
-    auto dates = timeInterval->getDates();
+    auto dates = timeInterval.getDates();
     query.bindValue(":BEGDATE", dates.first.toTime_t());
     query.bindValue(":ENDDATE", dates.second.toTime_t());
-    query.bindValue(":PROJID", timeInterval->getProjectID());
+    query.bindValue(":PROJID", timeInterval.getProjectID());
 
 
     if (false == query.exec())

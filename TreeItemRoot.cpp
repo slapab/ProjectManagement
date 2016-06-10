@@ -1,10 +1,11 @@
 #include "TreeItemRoot.h"
 
 TreeItemRoot::TreeItemRoot(QList<QVariant> && data, DataStorageAccessInterface & dataAccessObject)
-    : m_pParent {nullptr} // root never has parent
-    , m_DataAccessObject {dataAccessObject}
+    : TreeItem {nullptr, dataAccessObject} // root never has parent
     , m_RootData {std::move(data)}
 {
+    m_DataAccessObject.open();
+
     auto projects = m_DataAccessObject.getAllProjects();
     
     for (size_t i = 0; i < projects.size(); ++i)
@@ -12,12 +13,14 @@ TreeItemRoot::TreeItemRoot(QList<QVariant> && data, DataStorageAccessInterface &
         try
         {
             m_Childs.push_back(std::make_unique<TreeItem>(std::move(projects[i])
-                                                                                                   , this
-                                                                                                   , m_DataAccessObject));
+                                                        , this
+                                                        , m_DataAccessObject));
         }
         catch (...)
         {}
     }
+
+    m_DataAccessObject.close();
 }
 
 QVariant TreeItemRoot::data(int column) const

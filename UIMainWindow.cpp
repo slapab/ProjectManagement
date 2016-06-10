@@ -1,5 +1,6 @@
 #include "UIMainWindow.h"
 #include <memory> // std::unique_ptr
+#include <typeinfo> // std::typeid
 
 #include <QCalendarWidget>
 #include "TaskItem.h"   // QMaps for strings connected with task status and priority
@@ -9,6 +10,11 @@
 
 #include <QStatusBar>
 #include <QItemSelection>
+
+#include "ProjectItem.h"
+#include "TaskItem.h"
+#include "TimeInterval.h"
+
 
 UIMainWindow::UIMainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -193,7 +199,7 @@ void UIMainWindow::ItemInfoLayoutManager::connectUISignals()
                         auto selIdx = m_Parent.m_pTreeView->selectionModel()->selection().indexes().at(0);
                         auto & selItem = TreeModel::GetInternalPointer(selIdx)->getUnderlaidData();
 
-                        this->saveButtonAction(&selItem, false /*this is an update action*/);
+                        this->saveButtonAction(selItem, false /*this is an update action*/);
                     }
                     );
 }
@@ -392,82 +398,79 @@ void UIMainWindow::ItemInfoLayoutManager::fillItemInfoLayout(const TaskItemInter
 }
 
 
-void UIMainWindow::ItemInfoLayoutManager::commonSyncWithWidgets(ItemInterface * item)
+void UIMainWindow::ItemInfoLayoutManager::commonSyncWithWidgets(ItemInterface & item)
 {
-    item->setName(m_pItemNameEdit->text());
-    item->setDescription(m_pItemDescrEdit->toPlainText());
-    item->setBeginDate(m_pItemBeginDateEdit->dateTime());
-    item->setEndDate(m_pItemEndDateEdit->dateTime());
+    item.setName(m_pItemNameEdit->text());
+    item.setDescription(m_pItemDescrEdit->toPlainText());
+    item.setBeginDate(m_pItemBeginDateEdit->dateTime());
+    item.setEndDate(m_pItemEndDateEdit->dateTime());
 }
 
-void UIMainWindow::ItemInfoLayoutManager::syncWithWidgets(ProjectItemInterface * proj)
+void UIMainWindow::ItemInfoLayoutManager::syncWithWidgets(ProjectItemInterface & proj)
 {
-    commonSyncWithWidgets(static_cast<ItemInterface*>(proj));
+    commonSyncWithWidgets(static_cast<ItemInterface&>(proj));
 }
 
-void UIMainWindow::ItemInfoLayoutManager::syncWithWidgets(TimeIntervalInterface * timeInt)
+void UIMainWindow::ItemInfoLayoutManager::syncWithWidgets(TimeIntervalInterface & timeInt)
 {
-    commonSyncWithWidgets(static_cast<ItemInterface*>(timeInt));
+    commonSyncWithWidgets(static_cast<ItemInterface&>(timeInt));
 }
 
-void UIMainWindow::ItemInfoLayoutManager::syncWithWidgets(TaskItemInterface * task)
+void UIMainWindow::ItemInfoLayoutManager::syncWithWidgets(TaskItemInterface & task)
 {
     // sync common part
-    commonSyncWithWidgets(static_cast<ItemInterface*>(task));
+    commonSyncWithWidgets(static_cast<ItemInterface &>(task));
 
     // sync custom data
     QString priorityText = m_pTaskPriorityCombo->currentText();
-    task->setPriority(TaskItem::PRIORITY_STRINGS.value(priorityText));
+    task.setPriority(TaskItem::PRIORITY_STRINGS.value(priorityText));
 
     QString stateText = m_pTaskStatusCombo->currentText();
-    task->setState(TaskItem::STATE_STRINGS.value(stateText));
+    task.setState(TaskItem::STATE_STRINGS.value(stateText));
 }
 
 // actions
 
-void UIMainWindow::ItemInfoLayoutManager::saveButtonAction(ItemInterface * pItem, bool save)
+void UIMainWindow::ItemInfoLayoutManager::saveButtonAction(ItemInterface & pItem, bool save)
 {
+    using namespace std;
+
     if (false == save)
     // update in data storage
     {
         try {
             m_Parent.m_SQLiteDBManager.open();
 
-            // Check if it is project item
-            auto * pProjItem = dynamic_cast<ProjectItemInterface*>(pItem);
-            if (nullptr != pProjItem)
+            // check for concrete item type
+            if (typeid(ProjectItem) == typeid(pItem))
             {
+                auto & pProjItem = static_cast<ProjectItemInterface&>(pItem);
                 // Synchronize UI widgets data with underlaid object data
                 syncWithWidgets(pProjItem);
                 // update in database
                 m_Parent.m_SQLiteDBManager.updateProject(pProjItem);
             }
-            else
+            else if (typeid(TimeInterval) == typeid(pItem))
             {
-                // check if it is time interval
-                auto * pTimeItem = dynamic_cast<TimeIntervalInterface*>(pItem);
-                if (nullptr != pTimeItem)
-                {
-                    // Synchronize UI widgets data with underlaid object data
-                    syncWithWidgets(pTimeItem);
-                    // update in database
-                    m_Parent.m_SQLiteDBManager.updateTimeInterval(pTimeItem);
-                }
-                else
-                {
-                    // check if it is task
-                    auto * pTaskItem = dynamic_cast<TaskItemInterface*>(pItem);
-                    if (nullptr != pTaskItem)
-                    {
-                        // Synchronize UI widgets data with underlaid object data
-                        syncWithWidgets(pTaskItem);
-                        // update in database
-                        m_Parent.m_SQLiteDBManager.updateTaskItem(pTaskItem);
-                    }
-                }
+                auto & pTimeItem = static_cast<TimeIntervalInterface&>(pItem);
+                // Synchronize UI widgets data with underlaid object data
+                syncWithWidgets(pTimeItem);
+                // update in database
+                m_Parent.m_SQLiteDBManager.updateTimeInterval(pTimeItem);
+            }
+            else if (typeid(TaskItem) == typeid(pItem))
+            {
+                auto & pTaskItem = static_cast<TaskItemInterface&>(pItem);
+                // Synchronize UI widgets data with underlaid object data
+                syncWithWidgets(pTaskItem);
+                // update in database
+                m_Parent.m_SQLiteDBManager.updateTaskItem(pTaskItem);
             }
 
             m_Parent.m_SQLiteDBManager.close();
+
+            // Inform tree model view that data has been changed
+            emit m_Parent.m_pTreeView->dataChanged(QModelIndex(), QModelIndex());
 
             m_Parent.statusBar()->showMessage("Update succeeded");
         }

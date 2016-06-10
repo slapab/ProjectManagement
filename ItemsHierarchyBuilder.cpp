@@ -13,12 +13,12 @@ ItemsHierarchyBuilder::ProjectsContainerType ItemsHierarchyBuilder::buildWholeHi
     for (const auto & projItem : allProjects)
     {
         // get time intervals assigned to each project
-        auto allProjectTimes = m_DataAccessManager.getTimeIntervals(projItem);
+        auto allProjectTimes = m_DataAccessManager.getTimeIntervals(*projItem.get());
 
         for (const auto & timeItem : allProjectTimes)
         {
             // get all tasks assigned to each time interval
-            auto allTimeTasks = m_DataAccessManager.getTasks(timeItem);
+            auto allTimeTasks = m_DataAccessManager.getTasks(*timeItem.get());
 
             // move tasks container to time interval
             timeItem->setTasksContainer(std::move(allTimeTasks));

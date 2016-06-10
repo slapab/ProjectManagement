@@ -90,7 +90,7 @@ protected:
         void fillItemInfoLayout(const TaskItemInterface & taskItem);
         void fillItemInfoLayout(const TimeIntervalInterface & timeIntItem);
 
-        void saveButtonAction(ItemInterface * pItem, bool save);
+        void saveButtonAction(ItemInterface & pItem, bool save);
 
 
         // helper methods
@@ -99,11 +99,11 @@ protected:
         void createEmptyInfoLayout();
         void switchCurrentWidget(QWidget * widget);
 
-        void syncWithWidgets(ProjectItemInterface * proj);
-        void syncWithWidgets(TimeIntervalInterface * timeInt);
-        void syncWithWidgets(TaskItemInterface * task);
+        void syncWithWidgets(ProjectItemInterface & proj);
+        void syncWithWidgets(TimeIntervalInterface & timeInt);
+        void syncWithWidgets(TaskItemInterface & task);
         // Synchronize only common data
-        void commonSyncWithWidgets(ItemInterface * item);
+        void commonSyncWithWidgets(ItemInterface & item);
 
         // Members
     private:

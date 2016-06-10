@@ -36,23 +36,6 @@ TreeItemInterface * TreeItemBase::parent()
     return m_pParent;
 }
 
-int TreeItemBase::childNumber(const std::unique_ptr<TreeItemInterface> & child) const
-{
-    if (nullptr == child.get())
-    {
-        return 0;
-    }
-
-    // Find child
-    auto iter = std::find(m_Childs.begin(), m_Childs.end(), child);
-
-    if (m_Childs.end() != iter)
-    {
-        return std::distance(m_Childs.begin(), iter);
-    }
-
-    return 0;
-}
 
 /*
  * \note    This overload should be deletede if all raw pointers TreeItemInterface *

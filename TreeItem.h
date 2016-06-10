@@ -17,18 +17,21 @@ public:
     explicit TreeItem(timeint_ptr_type timeintItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject);
     
     virtual ~TreeItem() {}
-    
 
     // TreeItemInterface interface
 public:
     TreeItemInterface * child(int number) override;
     int childCount() const override;
     int columnCount() const override;
-    int childNumber(const std::unique_ptr<TreeItemInterface> & child) const override;
     int childNumber(const TreeItemInterface * const child) const override;
     TreeItemInterface * parent() override;
     virtual QVariant data(int column) const override;
     virtual ItemInterface & getUnderlaidData() override;
+
+protected:
+    // Constructor for derived root tree item
+    TreeItem(TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject);
+
 
 protected:
     TreeItemInterface * m_pParent {nullptr};

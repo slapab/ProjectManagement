@@ -64,7 +64,7 @@ public:
     *           are managed by unique_ptr.
     *   \param timeInterval reference to time interval which tasks need to be read.
     */
-    virtual TasksContainerType getTasks(const timeint_ptr_type & timeInterval) = 0;
+    virtual TasksContainerType getTasks(const TimeIntervalInterface & timeInterval) = 0;
 
     /**
     *   \brief  Returns container with allocated on heap objects that represents
@@ -75,28 +75,25 @@ public:
     *           are managed by unique_ptr.
     *   \param proj reference to project which time intervals need to be read.
     */
-    virtual TimeIntContainerType getTimeIntervals(const project_ptr_type & proj) = 0;
+    virtual TimeIntContainerType getTimeIntervals(const ProjectItemInterface & proj) = 0;
 
     /**
     *   \brief  Performs project's data update in data storage. The data to be updated
     *           are stored inside pointer to project item object passed by reference.
     */
-    virtual void updateProject(const project_ptr_type & proj) = 0; //TODO remove this (cppiso standard)
-    virtual void updateProject(const ProjectItemInterface * proj) = 0;
+    virtual void updateProject(const ProjectItemInterface & proj) = 0;
 
     /**
     *   \brief  Performs task's data update in data storage. The data to be updated
     *           are stored inside pointer to task item object passed by reference.
     */
-    virtual void updateTaskItem(const task_ptr_type & task) = 0; //TODO remove this (cppiso standard)
-    virtual void updateTaskItem(const TaskItemInterface * task) = 0;
+    virtual void updateTaskItem(const TaskItemInterface & task) = 0;
 
     /**
     *   \brief  Performs time interval's data update in data storage. The data to be updated
     *           are stored inside pointer to time interval item object passed by reference.
     */
-    virtual void updateTimeInterval(const timeint_ptr_type & timeInterval) = 0; //TODO remove this (cppiso standard)
-    virtual void updateTimeInterval(const TimeIntervalInterface * timeInterval) = 0;
+    virtual void updateTimeInterval(const TimeIntervalInterface & timeInterval) = 0;
 
     /**
     *   \brief  Adds new project data to data storage and returns the object filled with

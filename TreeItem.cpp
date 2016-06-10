@@ -3,7 +3,7 @@
 #include <exception>
 
 
-TreeItem(project_ptr_type projItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
+TreeItem::TreeItem(project_ptr_type projItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
     : m_pParent {parent}
     , m_itemData {std::move(projItem)}
     , m_DataAccessObject {dataAccessObject}
@@ -14,15 +14,15 @@ TreeItem(project_ptr_type projItem, TreeItemInterface * parent, DataStorageAcces
     }
     
     
-    auto timeIntervals = m_DataAccessObject.getTimeIntervals(m_itemData);
+    auto timeIntervals = m_DataAccessObject.getTimeIntervals(static_cast<ProjectItemInterface&>(*m_itemData.get()));
     
     for (size_t i = 0; i < timeIntervals.size(); ++i)
     {
         try
         {
             m_Childs.push_back(std::make_unique<TreeItem>(std::move(timeIntervals[i])
-                                                                                                        , this
-                                                                                                        , m_DataAccessObject));
+                                                        , this
+                                                        , m_DataAccessObject));
         }
         catch(...)
         {}
@@ -30,9 +30,9 @@ TreeItem(project_ptr_type projItem, TreeItemInterface * parent, DataStorageAcces
 }
 
 
-TreeItem(timeint_ptr_type timeintItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
+TreeItem::TreeItem(timeint_ptr_type timeintItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
     : m_pParent {parent}
-    , m_itemData {std::move(projItem)}
+    , m_itemData {std::move(timeintItem)}
     , m_DataAccessObject {dataAccessObject}
 {
     if (nullptr == m_itemData.get())
@@ -41,24 +41,24 @@ TreeItem(timeint_ptr_type timeintItem, TreeItemInterface * parent, DataStorageAc
     }
     
     
-    auto tasks = m_DataAccessObject.getTasks(m_itemData);
+    auto tasks = m_DataAccessObject.getTasks(static_cast<TimeIntervalInterface&>(*m_itemData.get()));
     
     for (size_t i = 0; i < tasks.size(); ++i)
     {
         try
         {
             m_Childs.push_back(std::make_unique<TreeItem>(std::move(tasks[i])
-                                                                                                        , this
-                                                                                                        , m_DataAccessObject));
+                                                        , this
+                                                        , m_DataAccessObject));
         }
         catch(...)
         {}
     }
 }
 
-TreeItem(task_ptr_type taskItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
+TreeItem::TreeItem(task_ptr_type taskItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
     : m_pParent {parent}
-    , m_itemData {std::move(projItem)}
+    , m_itemData {std::move(taskItem)}
     , m_DataAccessObject {dataAccessObject}
 {
     // task item has not any children
@@ -69,6 +69,11 @@ TreeItem(task_ptr_type taskItem, TreeItemInterface * parent, DataStorageAccessIn
     }
 }
 
+
+TreeItem::TreeItem(TreeItemInterface *parent, DataStorageAccessInterface &dataAccessObject)
+    : m_pParent(parent)
+    , m_DataAccessObject(dataAccessObject)
+{}
 
 
 TreeItemInterface * TreeItem::child(int number)
@@ -99,28 +104,7 @@ TreeItemInterface * TreeItem::parent()
     return m_pParent;
 }
 
-int TreeItem::childNumber(const std::unique_ptr<TreeItemInterface> & child) const
-{
-    if (nullptr == child.get())
-    {
-        return 0;
-    }
 
-    // Find child
-    auto iter = std::find(m_Childs.begin(), m_Childs.end(), child);
-
-    if (m_Childs.end() != iter)
-    {
-        return std::distance(m_Childs.begin(), iter);
-    }
-
-    return 0;
-}
-
-/*
- * \note    This overload should be deletede if all raw pointers TreeItemInterface *
- *          would be changed to unique_ptr<TreeItemInterface>
- */
 int TreeItem::childNumber(const TreeItemInterface * const child) const
 {
     if (nullptr == child)

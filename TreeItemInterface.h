@@ -17,7 +17,6 @@ public:
     virtual int childCount() const = 0;
     virtual int columnCount() const = 0;
     virtual QVariant data(int column) const = 0;
-    virtual int childNumber(const std::unique_ptr<TreeItemInterface> & child) const = 0; //TODO remove this method form interface
     virtual int childNumber(const TreeItemInterface * const child) const = 0;
     virtual TreeItemInterface * parent() = 0;
     virtual ItemInterface & getUnderlaidData() = 0;
