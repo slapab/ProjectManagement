@@ -13,8 +13,8 @@ public:
 
     // Custom implementation of TreeItem methods
 public:
-    QVariant data(int column) const;
-    ItemInterface & getUnderlaidData();
+    QVariant data(int column) const override;
+    ItemInterface & getUnderlaidData() override;
 
 
 private:

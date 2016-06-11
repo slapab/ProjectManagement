@@ -6,6 +6,16 @@
 
 #include "ItemInterface.h"
 
+
+enum class TreeItemType
+{
+      Task
+    , TimeInterval
+    , Project
+    , Root
+};
+
+
 class TreeItemInterface
 {
 public:
@@ -20,6 +30,8 @@ public:
     virtual int childNumber(const TreeItemInterface * const child) const = 0;
     virtual TreeItemInterface * parent() = 0;
     virtual ItemInterface & getUnderlaidData() = 0;
+    virtual TreeItemType getType() const = 0;
+
 //    virtual bool insertChildren(int position, int count, int columns) = 0;
 //    virtual bool insertColumns(int position, int columns) = 0;
 //    virtual bool removeChildren(int position, int count) = 0;

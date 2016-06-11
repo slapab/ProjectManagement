@@ -4,7 +4,8 @@
 
 
 TreeItem::TreeItem(project_ptr_type projItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
-    : m_pParent {parent}
+    : m_TreeItemType {TreeItemType::Project}
+    , m_pParent {parent}
     , m_itemData {std::move(projItem)}
     , m_DataAccessObject {dataAccessObject}
 {
@@ -31,7 +32,8 @@ TreeItem::TreeItem(project_ptr_type projItem, TreeItemInterface * parent, DataSt
 
 
 TreeItem::TreeItem(timeint_ptr_type timeintItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
-    : m_pParent {parent}
+    : m_TreeItemType {TreeItemType::TimeInterval}
+    , m_pParent {parent}
     , m_itemData {std::move(timeintItem)}
     , m_DataAccessObject {dataAccessObject}
 {
@@ -57,7 +59,8 @@ TreeItem::TreeItem(timeint_ptr_type timeintItem, TreeItemInterface * parent, Dat
 }
 
 TreeItem::TreeItem(task_ptr_type taskItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
-    : m_pParent {parent}
+    : m_TreeItemType {TreeItemType::Task}
+    , m_pParent {parent}
     , m_itemData {std::move(taskItem)}
     , m_DataAccessObject {dataAccessObject}
 {
@@ -69,9 +72,10 @@ TreeItem::TreeItem(task_ptr_type taskItem, TreeItemInterface * parent, DataStora
     }
 }
 
-
+// Constructor for root item
 TreeItem::TreeItem(TreeItemInterface *parent, DataStorageAccessInterface &dataAccessObject)
-    : m_pParent(parent)
+    : m_TreeItemType {TreeItemType::Root}
+    , m_pParent(parent)
     , m_DataAccessObject(dataAccessObject)
 {}
 
@@ -102,6 +106,11 @@ int TreeItem::columnCount() const
 TreeItemInterface * TreeItem::parent()
 {
     return m_pParent;
+}
+
+TreeItemType TreeItem::getType() const
+{
+    return m_TreeItemType;
 }
 
 

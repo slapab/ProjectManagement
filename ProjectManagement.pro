@@ -19,14 +19,11 @@ SOURCES += main.cpp\
     TaskItem.cpp \
     SQLiteAccess.cpp \
     UIMainWindow.cpp \
-    TreeItemProject.cpp \
-    TreeItemBase.cpp \
-    TreeItemTimeInterval.cpp \
-    TreeItemTask.cpp \
     TreeModel.cpp \
     TreeItemRoot.cpp \
     ItemsHierarchyBuilder.cpp \
-    TreeItem.cpp
+    TreeItem.cpp \
+    ItemInfoLayoutManager.cpp
 
 HEADERS  += mainwindow.h \
     ProjectItem.h \
@@ -39,15 +36,12 @@ HEADERS  += mainwindow.h \
     SQLiteAccess.h \
     UIMainWindow.h \
     TreeItemInterface.h \
-    TreeItemProject.h \
-    TreeItemBase.h \
-    TreeItemTimeInterval.h \
-    TreeItemTask.h \
     TreeModel.h \
     TreeItemRoot.h \
     ItemsHierarchyBuilder.h \
     ItemInterface.h \
-    TreeItem.h
+    TreeItem.h \
+    ItemInfoLayoutManager.h
 
 FORMS    += mainwindow.ui
 

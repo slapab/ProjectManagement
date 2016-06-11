@@ -25,6 +25,7 @@ public:
     int columnCount() const override;
     int childNumber(const TreeItemInterface * const child) const override;
     TreeItemInterface * parent() override;
+    TreeItemType getType() const override;
     virtual QVariant data(int column) const override;
     virtual ItemInterface & getUnderlaidData() override;
 
@@ -34,10 +35,12 @@ protected:
 
 
 protected:
+    const TreeItemType m_TreeItemType;
     TreeItemInterface * m_pParent {nullptr};
     std::vector<std::unique_ptr<TreeItemInterface>> m_Childs; // auto delete
     std::unique_ptr<ItemInterface> m_itemData;
     DataStorageAccessInterface & m_DataAccessObject;
+
 
 };
 
