@@ -1,6 +1,7 @@
 #include "TreeItem.h"
 #include <algorithm>
 #include <exception>
+#include <memory>
 
 
 TreeItem::TreeItem(project_ptr_type projItem, TreeItemInterface * parent, DataStorageAccessInterface & dataAccessObject)
@@ -113,7 +114,7 @@ TreeItemType TreeItem::getType() const
     return m_TreeItemType;
 }
 
-
+// return child number which is referenced as child pointer
 int TreeItem::childNumber(const TreeItemInterface * const child) const
 {
     if (nullptr == child)
@@ -136,6 +137,17 @@ int TreeItem::childNumber(const TreeItemInterface * const child) const
     return 0;
 }
 
+// Get child number from parent child lists
+int TreeItem::childNumber() const
+{
+    if (nullptr == m_pParent)
+    {
+        return 0;
+    }
+
+    return m_pParent->childNumber(this);
+}
+
 
 QVariant TreeItem::data(int column) const
 {
@@ -152,3 +164,88 @@ ItemInterface & TreeItem::getUnderlaidData()
     
     return *m_itemData.get();
 }
+
+bool TreeItem::createChild(ProjectItemInterface::project_ptr_type rawProjItem)
+{
+    try {
+        auto pTreeItem = std::make_unique<TreeItem>(std::move(rawProjItem)
+                                                  , this //parent
+                                                  , m_DataAccessObject
+                                                   );
+        m_Childs.push_back(std::move(pTreeItem));
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
+bool TreeItem::createChild(TimeIntervalInterface::timeint_ptr_type rawTimeItem)
+{
+    try {
+        auto pTreeItem = std::make_unique<TreeItem>(std::move(rawTimeItem)
+                                                  , this //parent
+                                                  , m_DataAccessObject
+                                                   );
+        m_Childs.push_back(std::move(pTreeItem));
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
+bool TreeItem::createChild(TimeIntervalInterface::task_ptr_type rawTaskItem)
+{
+    try {
+        auto pTreeItem = std::make_unique<TreeItem>(std::move(rawTaskItem)
+                                                  , this //parent
+                                                  , m_DataAccessObject
+                                                   );
+        m_Childs.push_back(std::move(pTreeItem));
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
+bool TreeItem::removeChild(const TreeItemInterface * ptr)
+{
+    auto it = std::find_if(m_Childs.begin(), m_Childs.end(),
+                                                [ptr] (const auto & uniquePtr)
+                                                {
+                                                    return ptr == uniquePtr.get();
+                                                });
+
+    if (m_Childs.end() == it)
+    {
+        return false;
+    }
+    else
+    {
+        // Remove from the vector
+        m_Childs.erase(it);
+
+        return true;
+    }
+}
+
+bool TreeItem::removeChildren(int position, int count)
+{
+    if (position < 0 || position + count > m_Childs.size())
+    {
+        return false;
+    }
+
+    const auto start_it = m_Childs.begin() + position;
+    const auto end_it = start_it + count;
+
+    m_Childs.erase(start_it, end_it); //childItems.takeAt(position);
+
+    return true;
+}
+

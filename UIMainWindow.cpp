@@ -109,56 +109,76 @@ void UIMainWindow::showTreeViewContextMenu(const QPoint & point)
 
     auto * selItem = TreeModel::GetInternalPointer(idx);
     QMenu menu;
+
     QAction * addProj = new QAction("Add new project", &menu);
+    addProj->setData(QVariant::fromValue(TreeItemType::Project));
+    QAction * addTimeInt = new QAction("Add new time interval", &menu);
+    addTimeInt->setData(QVariant::fromValue(TreeItemType::TimeInterval));
+    QAction * addTask = new QAction("Add new task", &menu);
+    addTask->setData(QVariant::fromValue(TreeItemType::Task));
+    QAction * del = new QAction("Delete", &menu);
+
     switch (selItem->getType())
     {
     case TreeItemType::Project:
         menu.addAction(addProj);
-        menu.addAction("Add new time interval");
-        menu.addAction("Delete");
+        menu.addAction(addTimeInt);
         break;
     case TreeItemType::TimeInterval:
-        menu.addAction("Add new task");
-        menu.addAction("Delete");
+        menu.addAction(addTask);
         break;
     case TreeItemType::Task:
-        menu.addAction("Delete");
         break;
     default:
         return;
         break;
     };
+    menu.addAction(del);
 
     QAction * ret = menu.exec(m_pTreeView->mapToGlobal(point));
 
     if (nullptr != ret)
     {
-        QString txt = ret->text();
-        if (true == txt.contains("add", Qt::CaseInsensitive))
-        {
-            // Special tratement for adding new project -> need to pass index for root item
-            if (true == txt.contains("project", Qt::CaseInsensitive))
-            {
-                // get root index
-                QModelIndex p = idx;
-                while (true == p.parent().isValid())
-                {
-                    p = p.parent();
-                }
-                p = p.parent(); // get eventually root item
-                // emit signal with root index to indicate to create the project item
-                emit treeContextAddItemTrigerred(p);
-            }
-            else
-            {
-                emit treeContextAddItemTrigerred(idx);
-            }
-        }
-        else if (true == txt.contains("delete", Qt::CaseInsensitive))
+        if (ret == del)
         {
             emit treeContextDelItemTrigerred(idx);
         }
+        else if (true == ret->data().isValid())
+        {
+            // emit add new item signal
+            emit treeContextAddItemTrigerred(ret->data().value<TreeItemType>());
+        }
     }
+
+
+//    if (nullptr != ret)
+//    {
+//        QString txt = ret->text();
+//        if (true == txt.contains("add", Qt::CaseInsensitive))
+//        {
+//            // Special tratement for adding new project -> need to pass index for root item
+//            if (true == txt.contains("project", Qt::CaseInsensitive))
+//            {
+//                // get root index
+//                QModelIndex p = idx;
+//                while (true == p.parent().isValid())
+//                {
+//                    p = p.parent();
+//                }
+//                p = p.parent(); // get eventually root item
+//                // emit signal with root index to indicate to create the project item
+//                emit treeContextAddItemTrigerred(p);
+//            }
+//            else
+//            {
+//                emit treeContextAddItemTrigerred(idx);
+//            }
+//        }
+//        else if (true == txt.contains("delete", Qt::CaseInsensitive))
+//        {
+//            emit treeContextDelItemTrigerred(idx);
+//        }
+//    }
 }
 
 

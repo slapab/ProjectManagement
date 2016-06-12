@@ -477,16 +477,16 @@ timeint_ptr_type SQLiteAccess::addTimeInterval(int projectID, QString name, QStr
                 );
 }
 
-void SQLiteAccess::removeProjectItem(const project_ptr_type &proj)
+void SQLiteAccess::removeProjectItem(const ProjectItemInterface & proj)
 {
     QSqlQuery query(m_DB);
     query.prepare(
                 "DELETE FROM projects_table "
                 " WHERE "
-                " project_id = ':PROJID'"
+                " project_id = (:PROJID)"
                 );
 
-    query.bindValue(":PROJID", proj->getID());
+    query.bindValue(":PROJID", proj.getID());
 
     if (false == query.exec())
     {
@@ -494,17 +494,17 @@ void SQLiteAccess::removeProjectItem(const project_ptr_type &proj)
     }
 }
 
-void SQLiteAccess::removeTaskItem(const task_ptr_type &task)
+void SQLiteAccess::removeTaskItem(const TaskItemInterface & task)
 {
     QSqlQuery query(m_DB);
 
     query.prepare(
                 " DELETE FROM tasks_table "
                 " WHERE "
-                " task_id=':TASKID'"
+                " task_id=(:TASKID)"
                 );
 
-    query.bindValue(":TASKID", task->getID());
+    query.bindValue(":TASKID", task.getID());
 
     if (false == query.exec())
     {
@@ -512,17 +512,17 @@ void SQLiteAccess::removeTaskItem(const task_ptr_type &task)
     }
 }
 
-void SQLiteAccess::removeTimeInterval(const timeint_ptr_type &timeInterval)
+void SQLiteAccess::removeTimeInterval(const TimeIntervalInterface & timeInterval)
 {
     QSqlQuery query(m_DB);
 
     query.prepare(
                 " DELETE FROM intervals_table "
                 " WHERE "
-                " interval_id=':INTID'"
+                " interval_id=(:INTID)"
                 );
 
-    query.bindValue(":INTID", timeInterval->getID());
+    query.bindValue(":INTID", timeInterval.getID());
 
     if (false == query.exec())
     {

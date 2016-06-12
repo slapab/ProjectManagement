@@ -44,12 +44,20 @@ void ItemInfoLayoutManager::setCurrentLayout(const InfoLayoutType type)
 
 void ItemInfoLayoutManager::connectUISignals()
 {
-    QObject::connect(this->m_pSaveButton, &QPushButton::clicked,
+    connect(this->m_pSaveButton, &QPushButton::clicked,
                     [this](bool checked)
                     {
                         auto selIdx = m_Parent.m_pTreeView->selectionModel()->selection().indexes().at(0);
-                        auto & selItem = TreeModel::GetInternalPointer(selIdx)->getUnderlaidData();
-                        saveButton_updateAction(selItem);
+
+                        if (true == m_IsEditingItem)
+                        {
+                            saveButton_updateAction(selIdx);
+                        }
+                        // creating new item
+                        else
+                        {
+                            saveButton_saveNewAction(selIdx);
+                        }
                     }
                     );
 }
@@ -239,6 +247,7 @@ void ItemInfoLayoutManager::fillItemInfoLayout(const TimeIntervalInterface & tim
     m_pAdditionalInfo->setText(QString("Assigned tasks: ").append(taskCount));
 }
 
+
 void ItemInfoLayoutManager::fillItemInfoLayout(const TaskItemInterface & taskItem, const QModelIndex & index)
 {
     m_pItemTypeLabel->setText("Item type: <b><i>Task</i></b>");
@@ -306,10 +315,11 @@ void ItemInfoLayoutManager::clearWidgetsData()
 
 // actions:
 
-void ItemInfoLayoutManager::saveButton_updateAction(ItemInterface & pItem)
+void ItemInfoLayoutManager::saveButton_updateAction(const QModelIndex & index)
 {
     using namespace std;
 
+    auto & pItem = TreeModel::GetInternalPointer(index)->getUnderlaidData();
     try {
         m_Parent.m_SQLiteDBManager.open();
 
@@ -353,9 +363,143 @@ void ItemInfoLayoutManager::saveButton_updateAction(ItemInterface & pItem)
 
 }
 
-// slot
-void ItemInfoLayoutManager::treeContextCreateNewItemAction(const QModelIndex & index)
+
+void ItemInfoLayoutManager::saveButton_saveNewAction(const QModelIndex & index)
 {
+    // get selected tree item
+    auto treeItemIdx = m_Parent.m_pTreeView->selectionModel()->selectedIndexes().at(0);
+    if (false == treeItemIdx.isValid())
+    {
+        return;
+    }
+
+    try
+    {
+        // Open database connection and insert new item
+        m_Parent.m_SQLiteDBManager.open();
+
+        if (TreeItemType::Project == m_CreatingItemType)
+        {
+            auto pNewProjectItem = m_Parent.m_SQLiteDBManager.addProject(
+                                                   m_pItemNameEdit->text()
+                                                 , m_pItemDescrEdit->toPlainText()
+                                                 , m_pItemBeginDateEdit->dateTime()
+                                                 , m_pItemEndDateEdit->dateTime()
+                                                 );
+
+            // Get the root tree item pointer
+            auto * pProjTreeItem = TreeModel::GetInternalPointer(treeItemIdx);
+            auto * rootItem = pProjTreeItem->parent();  // root must exists
+            rootItem->createChild(std::move(pNewProjectItem));  // create new project item
+
+        }
+        else if (TreeItemType::TimeInterval == m_CreatingItemType)
+        {
+            auto * projTreeItem = TreeModel::GetInternalPointer(treeItemIdx);
+            auto & projItem = projTreeItem->getUnderlaidData();
+
+            auto pNewTimeInt = m_Parent.m_SQLiteDBManager.addTimeInterval(
+                                                   projItem.getID()
+                                                 , m_pItemNameEdit->text()
+                                                 , m_pItemDescrEdit->toPlainText()
+                                                 , m_pItemBeginDateEdit->dateTime()
+                                                 , m_pItemEndDateEdit->dateTime()
+                                                  );
+
+            // add time interval to the selected project tree item
+            projTreeItem->createChild(std::move(pNewTimeInt));
+        }
+        else if (TreeItemType::Task == m_CreatingItemType)
+        {
+            auto * timeTreeItem = TreeModel::GetInternalPointer(treeItemIdx);
+            auto & timeItem = timeTreeItem->getUnderlaidData();
+
+            auto priority = TaskItem::PRIORITY_STRINGS.value(m_pTaskPriorityCombo->currentText());
+            auto state = TaskItem::STATE_STRINGS.value(m_pTaskStatusCombo->currentText());
+            auto pNewTask = m_Parent.m_SQLiteDBManager.addTaskItem(
+                                                   timeItem.getID()
+                                                 , priority
+                                                 , state
+                                                 , m_pItemNameEdit->text()
+                                                 , m_pItemDescrEdit->toPlainText()
+                                                 , m_pItemBeginDateEdit->dateTime()
+                                                 , m_pItemEndDateEdit->dateTime()
+                                                  );
+
+            timeTreeItem->createChild(std::move(pNewTask));
+        }
+
+        // Inform model about performed insertion of data
+        if (TreeItemType::Project == m_CreatingItemType)
+        {
+            // Handle root item for project insertion
+            m_Parent.m_pTreeView->model()->insertRows(0, 1, QModelIndex());
+        }
+        // handl rest item insersion
+        else
+        {
+            m_Parent.m_pTreeView->model()->insertRows(0, 1, treeItemIdx);
+        }
+
+        // emit selection changed to refresh item layotu
+        QItemSelection sel(treeItemIdx, treeItemIdx);
+        emit m_Parent.m_pTreeView->selectionModel()->selectionChanged(sel, sel);
+
+        m_Parent.statusBar()->showMessage("OK");
+    }
+    catch (std::exception & e)
+    {
+        //TODO log an error
+        m_Parent.statusBar()->showMessage(QString("Adding new item failed: ").append(e.what()));
+    }
+
+    m_Parent.m_SQLiteDBManager.close();
+}
+
+// slot
+void ItemInfoLayoutManager::treeContextCreateNewItemAction(TreeItemType createType)
+{
+
+    // After click on 'save' button the creating new item action should be performed
+    m_IsEditingItem = false;
+    // Store which type user want to create - it will be used in action method when user
+    // click on the save button.
+    m_CreatingItemType = createType;
+
+    setCurrentLayout(InfoLayoutType::ItemInfo);
+    clearWidgetsData();
+
+    // Set appropratie type information and prepare layout for created item type
+    QString t("Create new: <b><i>");
+    auto currDate = QDateTime::currentDateTime();
+
+    if (TreeItemType::Project == createType)
+    {
+        t.append("Project");
+        ProjectItem p(0, "", "", currDate, currDate);
+        fillItemInfoLayout(p, QModelIndex()); // prepare layout for project item
+    }
+    else if (TreeItemType::TimeInterval == createType)
+    {
+        TimeInterval tI(0, 0, "", "", currDate, currDate);
+        fillItemInfoLayout(tI, QModelIndex()); // prepare layout for time interval item
+        t.append("Time interval");
+    }
+    else if (TreeItemType::Task == createType)
+    {
+        TaskItem tTask(0, 0, TaskPriority::Normal, TaskState::Originated, "", "", currDate, currDate);
+        fillItemInfoLayout(tTask, QModelIndex()); // Prepare layout for task item
+        t.append("Task");
+    }
+    t.append("</i></b>");
+    m_pItemTypeLabel->setText(t);
+
+}
+
+// slot
+void ItemInfoLayoutManager::treeContextDeleteItemAction(const QModelIndex & index)
+{
+//    m_Parent.statusBar()->showMessage(QString("Deleting ").append(index.data(0).toString()));
     if (false == index.isValid())
     {
         return;
@@ -363,43 +507,41 @@ void ItemInfoLayoutManager::treeContextCreateNewItemAction(const QModelIndex & i
 
     auto * treeItem = TreeModel::GetInternalPointer(index);
 
-    // After click on 'save' button the creating new item action should be performed
-    m_IsEditingItem = false;
-
-    setCurrentLayout(InfoLayoutType::ItemInfo);
-    clearWidgetsData();
-
-    // Set appropratie type information and prepare layout for created item type
-    QString t("Create new: <b><i>");
-    auto parentType = treeItem->getType();
-    if (TreeItemType::Root == parentType)
+    if (nullptr == treeItem)
     {
-        t.append("Project");
-        ProjectItem p(0, "", "", QDateTime::currentDateTime(), QDateTime::currentDateTime());
-        fillItemInfoLayout(p, QModelIndex()); // prepare layout for project item
+        return;
     }
-    else if (TreeItemType::Project == parentType)
-    {
-        TimeInterval tI(0, 0, "", "", QDateTime::currentDateTime(), QDateTime::currentDateTime());
-        fillItemInfoLayout(tI, QModelIndex()); // prepare layout for time interval item
-        t.append("Time interval");
-    }
-    else if (TreeItemType::TimeInterval == parentType)
-    {
-        TaskItem tTask(0, 0, TaskPriority::Normal, TaskState::Originated, "", "", QDateTime::currentDateTime(), QDateTime::currentDateTime());
-        fillItemInfoLayout(tTask, QModelIndex()); // Prepare layout for task item
-        t.append("Task");
-    }
-    t.append("</i></b>");
-    m_pItemTypeLabel->setText(t);
 
-//    m_Parent.statusBar()->showMessage(QString("Create in parent: ").append(index.data(0).toString()));
-}
+    try
+    {
+        m_Parent.m_SQLiteDBManager.open();
 
-// slot
-void ItemInfoLayoutManager::treeContextDeleteItemAction(const QModelIndex & index)
-{
-    m_Parent.statusBar()->showMessage(QString("Deleting ").append(index.data(0).toString()));
+        const TreeItemType itemType = treeItem->getType();
+        if (TreeItemType::Project == itemType)
+        {
+            auto & proj = static_cast<ProjectItemInterface&>(treeItem->getUnderlaidData());
+            m_Parent.m_SQLiteDBManager.removeProjectItem(proj);
+        }
+        else if (TreeItemType::TimeInterval == itemType)
+        {
+            auto & timeInt = static_cast<TimeIntervalInterface&>(treeItem->getUnderlaidData());
+            m_Parent.m_SQLiteDBManager.removeTimeInterval(timeInt);
+        }
+        else if (TreeItemType::Task == itemType)
+        {
+            auto & task = static_cast<TaskItemInterface&>(treeItem->getUnderlaidData());
+            m_Parent.m_SQLiteDBManager.removeTaskItem(task);
+        }
+
+        // Remove item from tree model
+        int childRow = treeItem->parent()->childNumber(treeItem);
+        m_Parent.m_pTreeView->model()->removeRows(childRow, 1, index.parent());
+
+    }
+    catch(...)
+    {}
+
+    m_Parent.m_SQLiteDBManager.close();
 }
 
 // slot
@@ -417,7 +559,6 @@ void ItemInfoLayoutManager::treeItemSelectedAction(const QItemSelection &selecte
 
     // set current layout to item view layout
     setCurrentLayout(ItemInfoLayoutManager::InfoLayoutType::ItemInfo);
-
 
     auto * pTreeItemI = TreeModel::GetInternalPointer(index);
     auto type = pTreeItemI->getType();

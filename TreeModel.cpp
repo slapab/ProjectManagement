@@ -97,6 +97,10 @@ QModelIndex TreeModel::parent(const QModelIndex & index) const
     }
 
     TreeItemInterface * childTreeItem = static_cast<TreeItemInterface*>(index.internalPointer());
+        if (childTreeItem == nullptr)
+        {
+            return QModelIndex();
+        }
     TreeItemInterface * parentTreeItem = childTreeItem->parent();
 
     if (m_rootItem.get() /*compare addresses*/ == parentTreeItem)
@@ -139,6 +143,42 @@ int TreeModel::columnCount(const QModelIndex & parent) const
     {
         return m_rootItem->columnCount();
     }
+}
+
+// this method just use the beginInsertRows() and endInsertRows(), because
+// own implementation assume that tree child is created with custom data and
+// can not be set as QVariant
+bool TreeModel::insertRows(int position, int rows, const QModelIndex & parent)
+{
+    beginInsertRows(parent, position, position + rows - 1);
+//    success = parentItem->insertChildren(position, rows, rootItem->columnCount());
+    endInsertRows();
+
+    return true;
+}
+
+bool TreeModel::removeRows(int position, int rows, const QModelIndex & parent)
+{
+    TreeItemInterface * parentItem = nullptr;
+
+    if (false == parent.isValid())
+    {
+    // Handle root item
+        parentItem = m_rootItem.get();
+    }
+    else
+    // Normal item
+    {
+       parentItem = GetInternalPointer(parent);
+    }
+
+    bool success = true;
+
+    beginRemoveRows(parent, position, position + rows - 1);
+    success = parentItem->removeChildren(position, rows);
+    endRemoveRows();
+
+    return success;
 }
 
 

@@ -124,21 +124,21 @@ public:
 
     /**
     *   \brief Removes project data from data storage.
-    *   \param proj reference to pointer to object of project item which need to be deleted.
+    *   \param proj reference to object of project item which need to be deleted.
     */
-    virtual void removeProjectItem(const project_ptr_type & proj) = 0;
+    virtual void removeProjectItem(const ProjectItemInterface & proj) = 0;
 
     /**
     *   \brief Removes task data from data storage.
-    *   \param task reference to pointer to object of task item which need to be deleted.
+    *   \param task reference to object of task item which need to be deleted.
     */
-    virtual void removeTaskItem(const task_ptr_type & task) = 0;
+    virtual void removeTaskItem(const TaskItemInterface & task) = 0;
 
     /**
     *   \brief Removes time interval data from data storage.
-    *   \param timeInterval reference to pointer to object of project item which need to be deleted.
+    *   \param timeInterval reference to object of project item which need to be deleted.
     */
-    virtual void removeTimeInterval(const timeint_ptr_type & timeInterval) = 0;
+    virtual void removeTimeInterval(const TimeIntervalInterface & timeInterval) = 0;
 };
 
 #endif // DATASTORAGEACCESSINTERFACE_H

@@ -34,7 +34,7 @@ public:
 
 
 signals:
-    void treeContextAddItemTrigerred(const QModelIndex & index);
+    void treeContextAddItemTrigerred(TreeItemType createType);
     void treeContextDelItemTrigerred(const QModelIndex & index);
 
 

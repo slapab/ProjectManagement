@@ -76,9 +76,9 @@ public:
                      QString descr, QDateTime beginDate, QDateTime endDate) override;
     timeint_ptr_type addTimeInterval(int projectID, QString name, QString description, QDateTime beginDate, QDateTime endDate) override;
 
-    void removeProjectItem(const project_ptr_type & proj) override;
-    void removeTaskItem(const task_ptr_type & task) override;
-    void removeTimeInterval(const timeint_ptr_type & timeInterval) override;
+    void removeProjectItem(const ProjectItemInterface & proj) override;
+    void removeTaskItem(const TaskItemInterface & task) override;
+    void removeTimeInterval(const TimeIntervalInterface & timeInterval) override;
 
 
 protected:

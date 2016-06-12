@@ -62,7 +62,7 @@ public:
 
 public slots:
     // prepares layout for adding new item depending on parent
-    void treeContextCreateNewItemAction(const QModelIndex & index);
+    void treeContextCreateNewItemAction(TreeItemType createType);
     void treeContextDeleteItemAction(const QModelIndex & index);
     void treeItemSelectedAction(const QItemSelection &selected, const QItemSelection &deselected);
 
@@ -84,7 +84,8 @@ protected:
     void fillItemInfoLayout(const TaskItemInterface & taskItem, const QModelIndex & index);
     void fillItemInfoLayout(const TimeIntervalInterface & timeIntItem, const QModelIndex & index);
 
-    void saveButton_updateAction(ItemInterface & pItem);
+    void saveButton_updateAction(const QModelIndex & index);
+    void saveButton_saveNewAction(const QModelIndex & index);
 
 
     // Members for common item view layout
@@ -119,7 +120,11 @@ private:
     QStackedWidget * m_pItemInfoViewWidgets {nullptr};
 
     bool m_NeedDeleteStckedWidget {true};
-    bool m_IsEditingItem {false};   //true when user selected item from tree, false if user wants to add new item
+    // true when user selected item from tree, false if user wants to add new item
+    bool m_IsEditingItem {false};
+    // this memeber is and valid only when user wants to create new item
+    // it sotres the creating type, it is required to distinguish between new project and new time interval
+    TreeItemType m_CreatingItemType {TreeItemType::Root};
 };
 
 #endif // ITEMINFOLAYOUTMANAGER_H
