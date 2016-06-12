@@ -6,7 +6,6 @@
 #include "TaskItem.h"   // QMaps for strings connected with task status and priority
 
 #include "TreeModel.h"
-#include "TreeItemBase.h"
 
 #include <QStatusBar>
 #include <QItemSelection>

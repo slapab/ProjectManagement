@@ -12,7 +12,6 @@
 #include <utility>
 #include <QFrame>
 
-#include "TreeItemProject.h"
 #include "ItemsHierarchyBuilder.h"
 
 int main(int argc, char *argv[])
