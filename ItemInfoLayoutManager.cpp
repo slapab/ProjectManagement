@@ -47,14 +47,20 @@ void ItemInfoLayoutManager::connectUISignals()
     connect(this->m_pSaveButton, &QPushButton::clicked,
                     [this](bool checked)
                     {
-                        auto selIdx = m_Parent.m_pTreeView->selectionModel()->selection().indexes().at(0);
+                        QModelIndex selIdx;
 
-                        if (true == m_IsEditingItem)
+                        if (false == m_Parent.m_pTreeView->selectionModel()->selection().isEmpty())
+                        {
+                            selIdx = m_Parent.m_pTreeView->selectionModel()->selection().indexes().at(0);
+                        }
+
+                        // update item
+                        if ((true == m_IsEditingItem) && (true == selIdx.isValid()))
                         {
                             saveButton_updateAction(selIdx);
                         }
                         // creating new item
-                        else
+                        else if (false == m_IsEditingItem)
                         {
                             saveButton_saveNewAction(selIdx);
                         }
@@ -366,13 +372,6 @@ void ItemInfoLayoutManager::saveButton_updateAction(const QModelIndex & index)
 
 void ItemInfoLayoutManager::saveButton_saveNewAction(const QModelIndex & index)
 {
-    // get selected tree item
-    auto treeItemIdx = m_Parent.m_pTreeView->selectionModel()->selectedIndexes().at(0);
-    if (false == treeItemIdx.isValid())
-    {
-        return;
-    }
-
     try
     {
         // Open database connection and insert new item
@@ -388,14 +387,24 @@ void ItemInfoLayoutManager::saveButton_saveNewAction(const QModelIndex & index)
                                                  );
 
             // Get the root tree item pointer
-            auto * pProjTreeItem = TreeModel::GetInternalPointer(treeItemIdx);
-            auto * rootItem = pProjTreeItem->parent();  // root must exists
-            rootItem->createChild(std::move(pNewProjectItem));  // create new project item
+            auto * pProjTreeItem = TreeModel::GetInternalPointer(index);
+
+            if (nullptr != pProjTreeItem)
+            {
+                auto * rootItem = pProjTreeItem->parent();  // root must exists
+                rootItem->createChild(std::move(pNewProjectItem));  // create new project item
+            }
+            // Not exists, need to push into the root item
+            else
+            {
+                TreeModel * model = dynamic_cast<TreeModel*>(m_Parent.m_pTreeView->model());
+                model->insertProject(std::move(pNewProjectItem));
+            }
 
         }
         else if (TreeItemType::TimeInterval == m_CreatingItemType)
         {
-            auto * projTreeItem = TreeModel::GetInternalPointer(treeItemIdx);
+            auto * projTreeItem = TreeModel::GetInternalPointer(index);
             auto & projItem = projTreeItem->getUnderlaidData();
 
             auto pNewTimeInt = m_Parent.m_SQLiteDBManager.addTimeInterval(
@@ -411,7 +420,7 @@ void ItemInfoLayoutManager::saveButton_saveNewAction(const QModelIndex & index)
         }
         else if (TreeItemType::Task == m_CreatingItemType)
         {
-            auto * timeTreeItem = TreeModel::GetInternalPointer(treeItemIdx);
+            auto * timeTreeItem = TreeModel::GetInternalPointer(index);
             auto & timeItem = timeTreeItem->getUnderlaidData();
 
             auto priority = TaskItem::PRIORITY_STRINGS.value(m_pTaskPriorityCombo->currentText());
@@ -438,12 +447,15 @@ void ItemInfoLayoutManager::saveButton_saveNewAction(const QModelIndex & index)
         // handl rest item insersion
         else
         {
-            m_Parent.m_pTreeView->model()->insertRows(0, 1, treeItemIdx);
+            m_Parent.m_pTreeView->model()->insertRows(0, 1, index);
         }
 
-        // emit selection changed to refresh item layotu
-        QItemSelection sel(treeItemIdx, treeItemIdx);
-        emit m_Parent.m_pTreeView->selectionModel()->selectionChanged(sel, sel);
+        // emit selection changed to refresh item layotu only when index is valid
+        if (true == index.isValid())
+        {
+            QItemSelection sel(index, index);
+            emit m_Parent.m_pTreeView->selectionModel()->selectionChanged(sel, sel);
+        }
 
         m_Parent.statusBar()->showMessage("OK");
     }
@@ -497,9 +509,18 @@ void ItemInfoLayoutManager::treeContextCreateNewItemAction(TreeItemType createTy
 }
 
 // slot
-void ItemInfoLayoutManager::treeContextDeleteItemAction(const QModelIndex & index)
+void ItemInfoLayoutManager::treeContextDeleteItemAction(const QModelIndex & idx)
 {
 //    m_Parent.statusBar()->showMessage(QString("Deleting ").append(index.data(0).toString()));
+
+    auto indexes = m_Parent.m_pTreeView->selectionModel()->selection().indexes();
+    if (true == indexes.isEmpty())
+    {
+        return;
+    }
+
+    auto index = indexes.at(0);
+
     if (false == index.isValid())
     {
         return;
@@ -537,6 +558,12 @@ void ItemInfoLayoutManager::treeContextDeleteItemAction(const QModelIndex & inde
         int childRow = treeItem->parent()->childNumber(treeItem);
         m_Parent.m_pTreeView->model()->removeRows(childRow, 1, index.parent());
 
+        // set layout to empty when there is now child in tree
+        if (0 == m_Parent.m_pTreeView->model()->rowCount())
+        {
+            setCurrentLayout(InfoLayoutType::Empty);
+        }
+
     }
     catch(...)
     {}
@@ -547,6 +574,16 @@ void ItemInfoLayoutManager::treeContextDeleteItemAction(const QModelIndex & inde
 // slot
 void ItemInfoLayoutManager::treeItemSelectedAction(const QItemSelection &selected, const QItemSelection &)
 {
+    if (true == selected.isEmpty())
+    {
+        return;
+    }
+
+    if (true == selected.indexes().isEmpty())
+    {
+        return ;
+    }
+
     auto index = selected.indexes().at(0);
 
     if (false == index.isValid())

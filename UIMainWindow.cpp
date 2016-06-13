@@ -22,7 +22,7 @@
 UIMainWindow::UIMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_ItemInfoLayoutManager(*this)
-    , m_SQLiteDBManager("./testdb.sqlite")
+    , m_SQLiteDBManager("./data_db.sqlite")
 {
     this->setupUI();
     this->connectUISignals();
@@ -100,13 +100,24 @@ void UIMainWindow::connectUISignals()
 
 void UIMainWindow::showTreeViewContextMenu(const QPoint & point)
 {
+    TreeItemType createType;
+
+    // get selected item - if clicked outside of tree items then index should be invalid
     QModelIndex idx = m_pTreeView->indexAt(point);
+
+    // If clicked on blank area - not on the tree item
     if (false == idx.isValid())
     {
-        return;
+        createType = TreeItemType::Root;
+    }
+    // If clicked on tree item
+    else
+    {
+        auto * selItem = TreeModel::GetInternalPointer(idx);
+        createType = selItem->getType();
     }
 
-    auto * selItem = TreeModel::GetInternalPointer(idx);
+
     QMenu menu;
 
     QAction * addProj = new QAction("Add new project", &menu);
@@ -117,31 +128,39 @@ void UIMainWindow::showTreeViewContextMenu(const QPoint & point)
     addTask->setData(QVariant::fromValue(TreeItemType::Task));
     QAction * del = new QAction("Delete", &menu);
 
-    switch (selItem->getType())
+    switch (createType)
     {
+    case TreeItemType::Root:
+        menu.addAction(addProj);
+        break;
     case TreeItemType::Project:
         menu.addAction(addProj);
         menu.addAction(addTimeInt);
+        menu.addAction(del);
         break;
     case TreeItemType::TimeInterval:
         menu.addAction(addTask);
+        menu.addAction(del);
         break;
     case TreeItemType::Task:
+        menu.addAction(del);
         break;
     default:
         return;
         break;
     };
-    menu.addAction(del);
 
     QAction * ret = menu.exec(m_pTreeView->mapToGlobal(point));
 
+    // If selected some action
     if (nullptr != ret)
     {
+        // selected - delete option
         if (ret == del)
         {
-            emit treeContextDelItemTrigerred(idx);
+            emit treeContextDelItemTrigerred(QModelIndex());//idx
         }
+        // selected add new option
         else if (true == ret->data().isValid())
         {
             // emit add new item signal
@@ -149,35 +168,6 @@ void UIMainWindow::showTreeViewContextMenu(const QPoint & point)
         }
     }
 
-
-//    if (nullptr != ret)
-//    {
-//        QString txt = ret->text();
-//        if (true == txt.contains("add", Qt::CaseInsensitive))
-//        {
-//            // Special tratement for adding new project -> need to pass index for root item
-//            if (true == txt.contains("project", Qt::CaseInsensitive))
-//            {
-//                // get root index
-//                QModelIndex p = idx;
-//                while (true == p.parent().isValid())
-//                {
-//                    p = p.parent();
-//                }
-//                p = p.parent(); // get eventually root item
-//                // emit signal with root index to indicate to create the project item
-//                emit treeContextAddItemTrigerred(p);
-//            }
-//            else
-//            {
-//                emit treeContextAddItemTrigerred(idx);
-//            }
-//        }
-//        else if (true == txt.contains("delete", Qt::CaseInsensitive))
-//        {
-//            emit treeContextDelItemTrigerred(idx);
-//        }
-//    }
 }
 
 

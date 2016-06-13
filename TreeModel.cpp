@@ -15,7 +15,7 @@ TreeModel::TreeModel(DataStorageAccessInterface & dataAccessObject)
 
 TreeItemInterface * TreeModel::GetInternalPointer(const QModelIndex &index)
 {
-    if (!index.isValid())
+    if (false == index.isValid())
     {
         return nullptr;
     }
@@ -97,11 +97,17 @@ QModelIndex TreeModel::parent(const QModelIndex & index) const
     }
 
     TreeItemInterface * childTreeItem = static_cast<TreeItemInterface*>(index.internalPointer());
-        if (childTreeItem == nullptr)
-        {
-            return QModelIndex();
-        }
+    if (childTreeItem == nullptr)
+    {
+        return QModelIndex();
+    }
+
     TreeItemInterface * parentTreeItem = childTreeItem->parent();
+
+    if (nullptr == parentTreeItem)
+    {
+        return QModelIndex();
+    }
 
     if (m_rootItem.get() /*compare addresses*/ == parentTreeItem)
     {
@@ -179,6 +185,11 @@ bool TreeModel::removeRows(int position, int rows, const QModelIndex & parent)
     endRemoveRows();
 
     return success;
+}
+
+bool TreeModel::insertProject(project_ptr_type projItem)
+{
+    m_rootItem->createChild(std::move(projItem));
 }
 
 

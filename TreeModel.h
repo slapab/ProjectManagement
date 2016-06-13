@@ -13,6 +13,7 @@ class TreeModel : public QAbstractItemModel
 
 public:
     using ProjectsContainerType = DataStorageAccessInterface::ProjectsContainerType;
+    using project_ptr_type = DataStorageAccessInterface::project_ptr_type;
     using ptr_type = TreeItemInterface::ptr_type;
 
     explicit TreeModel(DataStorageAccessInterface & dataAccessObject);
@@ -33,6 +34,8 @@ public:
 
     bool insertRows(int position, int rows, const QModelIndex &parent);
     bool removeRows(int position, int rows, const QModelIndex &parent) override;
+
+    bool insertProject(project_ptr_type projItem);
 
 private:
 
