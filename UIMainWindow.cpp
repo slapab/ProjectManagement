@@ -22,7 +22,7 @@
 UIMainWindow::UIMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_ItemInfoLayoutManager(*this)
-    , m_SQLiteDBManager("./testdb.sqlite")
+    , m_SQLiteDBManager("./data_db.sqlite")
 {
     this->setupUI();
     this->connectUISignals();
