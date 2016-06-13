@@ -84,8 +84,6 @@ SQLiteAccess::~SQLiteAccess()
 
 void SQLiteAccess::open()
 {
-    m_DB.setConnectOptions("foreign_keys = ON");
-
     if (false == m_DB.open())
     {
         QString errText = m_DB.lastError().text();
@@ -93,6 +91,7 @@ void SQLiteAccess::open()
     }
     else
     {
+        m_DB.exec("PRAGMA foreign_keys=ON");
         createTables();
     }
 }
